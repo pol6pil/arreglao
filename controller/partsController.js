@@ -2,7 +2,6 @@
 
 const part = require('../model/part')
 const con = require('../middleware/sqlconnection')
-
 // Funcionalidades de la api respecto a piezas
 module.exports.getAllParts = async (req, res) => {
   const limit = Number(req.params.limit) || 0
@@ -80,6 +79,7 @@ module.exports.getPart = async (req, res) => {
   }
 }
 module.exports.addPart = async (req, res) => {
+  console.log(req.body, 'a', req.files)
   if (typeof req.body === 'undefined') {
     res.json({
       status: 'error',
@@ -87,7 +87,6 @@ module.exports.addPart = async (req, res) => {
     })
   } else {
     const connection = await con.getConnection()
-    console.log(req.body)
     // Hacemos una transaccion para poder insertar tanto como las piezas como las opciones
     try {
       await connection.beginTransaction()
@@ -96,9 +95,10 @@ module.exports.addPart = async (req, res) => {
       const result1 = await con.query(query1,
         [req.body.name, req.body.description, req.body.warranty, req.body.warning, req.body.note, req.body.category, req.body.appliance])
       const partId = result1[0].insertId
-      for (const option of req.body.options) {
+      console.log(req.files)
+      for (let i = 0; i < req.body.options.length; i++) {
         const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `imagen`, `precio`, `id_pieza`) VALUES (?,?,?,?)'
-        await con.query(queryOption, [option.name, option.imgUrl, option.price, partId])
+        await con.query(queryOption, [req.body.options[i].name, req.body.options[i].imgUrl, req.body.options[i].price, partId])
       }
 
       // Devolvemos el json del producto añadido si todo esta bien (reutilizamos codigo)
