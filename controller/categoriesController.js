@@ -19,12 +19,14 @@ module.exports.getCategory = async (req, res) => {
   }
 }
 
-// module.exports.getCategories = async (req, res) => {
-//   const sqlResponse = await con.query('SELECT * FROM categorias')
+module.exports.getCategories = async (req, res) => {
+  const sqlResponse = await con.query('SELECT * FROM categorias')
 
-//   // Procesamos la respuesta para poder enviarlas
-//   const row = sqlResponse[0]
-//   const json = part.toJson(row[0], options[0])
-//   console.log(json)
-//   res.send(json)
-// }
+  // Procesamos la respuesta para poder enviarlas
+  const rows = sqlResponse[0]
+  const jsons = []
+  for (const row of rows) {
+    jsons.push(category.toJson(row))
+  }
+  res.send(jsons)
+}

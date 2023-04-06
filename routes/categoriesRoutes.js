@@ -7,7 +7,7 @@ const part = require('../controller/categoriesController')
 
 // Rutas de pieza
 
-// router.get('/', part.getAllCategories)
+router.get('/', part.getCategories)
 router.get('/:id', part.getCategory)
 
 module.exports = router

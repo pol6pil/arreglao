@@ -5,12 +5,13 @@ const router = express.Router()
 const part = require('../controller/partsController')
 const multer = require('multer')
 const path = require('path')
+const { randomInt } = require('crypto')
 
 // Configuramos el almacenamiento de multer con la carpeta piezas
 const storage = multer.diskStorage({
   destination: path.join(process.cwd(), '/public/images/parts/'),
   filename: function (_req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+    cb(null, file.fieldname + randomInt(1, 9420564) + '-' + Date.now() + path.extname(file.originalname))
   }
 })
 const upload = multer({
