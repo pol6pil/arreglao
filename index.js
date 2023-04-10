@@ -14,6 +14,7 @@ const PORT = process.env.PORT || 80
 
 // Importacion de rutas
 const partsRoute = require('./routes/partsRoutes')
+const appliancesRoute = require('./routes/appliancesRoutes')
 const categoriesRoute = require('./routes/categoriesRoutes')
 const imgRoute = require('./routes/imgRoutes')
 
@@ -29,6 +30,7 @@ app.use(cors({
 
 // Asignacion de rutas
 app.use('/parts', partsRoute)
+app.use('/appliances', appliancesRoute)
 app.use('/categories', categoriesRoute)
 app.use('/img', imgRoute)
 

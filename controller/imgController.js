@@ -11,3 +11,11 @@ module.exports.getPart = (req, res) => {
 
   fileCheck(imgUrl, () => res.sendFile(imgUrl), () => res.sendFile(path.join(process.cwd(), '/public/images/errorImage.webp')))
 }
+
+module.exports.getAppliance = (req, res) => {
+  // Si la imagen existe la enviamos, si no enviamos una imagen por defecto
+  const img = req.params.img
+  const imgUrl = path.join(process.cwd(), `/public/images/appliances/${img}`)
+
+  fileCheck(imgUrl, () => res.sendFile(imgUrl), () => res.sendFile(path.join(process.cwd(), '/public/images/errorImage.webp')))
+}
