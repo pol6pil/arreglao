@@ -6,13 +6,13 @@ console.log(form)
 
 form.onsubmit = (e) => {
   e.preventDefault()
-  const files = form.files.files
-  console.log(files)
+  const file = form.imagen
+  console.log(file)
   const formData = new FormData()
 
   formData.append('name', form.nombre.value)
 
-  formData.append('files', files)
+  formData.append('files', file.files[0])
 
   submitAppliance(formData)
 }

@@ -99,9 +99,14 @@ module.exports.addPart = async (req, res) => {
       const partId = result1[0].insertId
       const options = JSON.parse(req.body.options)
       for (let i = 0; i < options.length; i++) {
-        const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `imagen`, `precio`, `id_pieza`) VALUES (?,?,?,?)'
-        console.log(options[i].name, req.files[i].filename, options[i].price, partId)
-        await con.query(queryOption, [options[i].name, req.files[i].filename, options[i].price, partId])
+        // Si se ha insertado una imagen la subimos a la bbdd
+        if (req.files.length > 0) {
+          const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `imagen`, `precio`, `id_pieza`) VALUES (?,?,?,?)'
+          await con.query(queryOption, [options[i].name, req.files[i].filename, options[i].price, partId])
+        } else {
+          const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `precio`, `id_pieza`) VALUES (?,?,?)'
+          await con.query(queryOption, [options[i].name, options[i].price, partId])
+        }
       }
 
       // Devolvemos el json del producto añadido si todo esta bien (reutilizamos codigo)
@@ -111,9 +116,10 @@ module.exports.addPart = async (req, res) => {
     } catch (error) {
       await connection.rollback()
       // Borramos todas las imagenes
-
-      for (let i = 0; i < JSON.parse(req.body.options).length; i++) {
-        deleteFile(path.join(process.cwd(), '/public/images/parts/', req.files[i].filename))
+      if (req.files.length > 0) {
+        for (let i = 0; i < JSON.parse(req.body.options).length; i++) {
+          deleteFile(path.join(process.cwd(), '/public/images/parts/', req.files[i].filename))
+        }
       }
 
       console.log(error)
@@ -122,18 +128,53 @@ module.exports.addPart = async (req, res) => {
   }
 }
 
-// const product = {
-//   id: 21,
-//   title: req.body.title,
-//   price: req.body.price,
-//   description: req.body.description,
-//   image: req.body.image,
-//   category: req.body.category
-// }
-// product.save()
-//   .then(product => res.json(product))
-//   .catch(err => console.log(err))
-// });}
+module.exports.editPart = async (req, res) => {
+  const partId = req.params.category || 0
+  if (typeof req.body === 'undefined') {
+    res.json({
+      status: 'error',
+      message: 'data is undefined'
+    })
+  } else {
+    const connection = await con.getConnection()
+    // Hacemos una transaccion para poder insertar tanto como las piezas como las opciones
+    try {
+      await connection.beginTransaction()
+      // Editamos la pieza la pieza
+      const query1 = 'UPDATE `piezas` SET `nombre`=?,`descripcion`=?,`garantia`=?,`advertencia`=?,`nota`=?,`id_categoria`=?,`id_electrodomestico`=? WHERE `id_pieza`=?'
+      const result1 = await con.query(query1,
+        [req.body.name, req.body.description, req.body.warranty, req.body.warning, req.body.note, req.body.category, req.body.appliance])
+      const partId = result1[0].insertId
+      const options = JSON.parse(req.body.options)
+      for (let i = 0; i < options.length; i++) {
+        // Si se ha insertado una imagen la subimos a la bbdd
+        if (req.files.length > 0) {
+          const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `imagen`, `precio`, `id_pieza`) VALUES (?,?,?,?)'
+          await con.query(queryOption, [options[i].name, req.files[i].filename, options[i].price, partId])
+        } else {
+          const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `precio`, `id_pieza`) VALUES (?,?,?)'
+          await con.query(queryOption, [options[i].name, options[i].price, partId])
+        }
+      }
+
+      // Devolvemos el json del producto añadido si todo esta bien (reutilizamos codigo)
+      res.send(await getPartSql(partId))
+      await connection.commit()
+      // Si da error la insercion, borramos la imagen y hacemos un rollback a la transaccion
+    } catch (error) {
+      await connection.rollback()
+      // Borramos todas las imagenes
+      if (req.files.length > 0) {
+        for (let i = 0; i < JSON.parse(req.body.options).length; i++) {
+          deleteFile(path.join(process.cwd(), '/public/images/parts/', req.files[i].filename))
+        }
+      }
+
+      console.log(error)
+      res.status(400).send({ error: 'insert failed' })
+    }
+  }
+}
 
 async function getPartSql (id) {
   // Consulta a la bbdd a la pieza con el id

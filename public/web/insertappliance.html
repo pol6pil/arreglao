@@ -10,14 +10,14 @@
 </head>
 
 <body>
-    <form name="appliance" enctype="multipart/form-data" onsubmit="return false">
+    <form name="appliance" enctype="multipart/form-data" method="post" onsubmit="return false">
         <div>
             <label for="nombre">Nombre:</label>
             <input type="text" name="nombre">
         </div>
         <div>
             <label for="files">Imagen:</label>
-            <input type="file" name="files" accept="image/*">
+            <input type="file" name="imagen" accept="image/*">
         </div>
         <input type="submit" value="Enviar">
     </form>

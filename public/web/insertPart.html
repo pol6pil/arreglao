@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./insertPart.js" defer></script>
+</head>
+
+<body>
+    <form action="#" enctype="multipart/form-data" method="post" name="pieza">
+        <div>
+            <label for="nombre">Nombre:</label>
+            <input required type="text" name="nombre"><br>
+        </div>
+        <div>
+            <label for="descripcion">Descripcion:</label>
+            <textarea required name="descripcion" id="" cols="30" rows="10"></textarea>
+        </div>
+        <div>
+            <label for="garantia">Garantia:</label>
+            <input required type="number" name="garantia"><br>
+        </div>
+        <div>
+            <label for="advertencia">Advertencia:</label>
+            <input type="text" name="advertencia"><br>
+        </div>
+        <div>
+            <label for="nota">Nota:</label>
+            <input type="text" name="nota"><br>
+        </div>
+        <div id="categories">
+            <label for="categoria">Categoria:</label>
+        </div>
+        <div id="appliances">
+            <label for="electronico">Electronico:</label>
+        </div>
+        <div id="options">
+            <h2>Opciones</h2>
+        </div>
+        <div>
+            <span>Añadir Opcion</span>
+            <button type="button" id="addOptionButton">+</button>
+        </div>
+        <input type="submit" value="Subir">
+    </form>
+</body>
+
+</html>

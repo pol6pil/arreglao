@@ -50,7 +50,7 @@ module.exports.getAppliance = async (req, res) => {
   }
 }
 module.exports.addAppliance = async (req, res) => {
-  console.log(req.body, 'a', req.body.files[0])
+  console.log(req.body, 'a', req.files[0])
   if (typeof req.body === 'undefined') {
     res.json({
       status: 'error',
@@ -64,7 +64,7 @@ module.exports.addAppliance = async (req, res) => {
       // Insertamos la pieza
       const query = 'INSERT INTO `electrodomestico`(`nombre`, `imagen`) VALUES (?,?)'
       const result = await con.query(query,
-        [req.body.name, req.body.files.filename])
+        [req.body.name, req.files[0].filename])
       const partId = result[0].insertId
       // Devolvemos el json del producto añadido si todo esta bien (reutilizamos codigo)
       res.send(await getApplianceSql(partId))
@@ -73,7 +73,7 @@ module.exports.addAppliance = async (req, res) => {
     } catch (error) {
       await connection.rollback()
       // Borramos todas la imagen
-      deleteFile(path.join(process.cwd(), '/public/images/appliances/', req.body.files.filename))
+      deleteFile(path.join(process.cwd(), '/public/images/appliances/', req.files[0].filename))
 
       console.log(error)
       res.status(400).send({ error: 'insert failed' })
