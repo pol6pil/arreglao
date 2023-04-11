@@ -45,6 +45,7 @@ async function insertPart (formData) {
   console.log(json)
 }
 async function updatePart (id, formData) {
+  console.log(id, formData)
   const res = await fetch(`http://localhost/parts/${id}`, {
     method: 'PUT',
     body: formData // Payload is formData object
@@ -58,7 +59,6 @@ async function showPart (id, form) {
   // Recibimos la parte de la api
   const res = await fetch(`http://localhost/parts/${id}`)
   const json = await res.json()
-  console.log(json)
 
   // Rellenamos los campos con la parte
   form.nombre.value = json.name
@@ -74,13 +74,14 @@ async function showPart (id, form) {
   // Mostramos las opciones de la parte
   // eslint-disable-next-line no-unused-vars
   for (const option of json.options) {
-    addOptionForm(options)
+    addOptionForm(options, true)
     eval('form.nombreOpt' + options + '.value = option.name')
+    eval('form.precioOpt' + options + '.value = option.price')
     options++
   }
 }
 // Evento del boton para generar un formulario de opcion
-function addOptionForm (id) {
+function addOptionForm (id, isUpdate) {
   // Generamos el div de la opcion
   const optionsDiv = document.querySelector('#options')
   const optionDiv = document.createElement('div')
@@ -135,6 +136,10 @@ function addOptionForm (id) {
   precioDiv.append(precioInput)
 
   optionDiv.append(precioDiv)
+  if (isUpdate) {
+    optionDiv.className = 'optionUpdate'
+  }
+
   optionsDiv.append(optionDiv)
 }
 // Recibimos el usuario y el id del producto
@@ -173,9 +178,10 @@ addOptionButton.onclick = function (e) {
 form.onsubmit = (e) => {
   e.preventDefault()
   // Prevents HTML handling submission
-  const options = document.querySelectorAll('.option')
+  const options = document.querySelectorAll('.optionUpdate, .option')
+  // Creamos un formData al que pasarle todos los datos del formulario
   const formData = new FormData()
-  // Creates empty formData object
+
   formData.append('name', form.nombre.value)
   formData.append('description', form.descripcion.value)
   formData.append('warranty', form.garantia.value)
@@ -185,12 +191,14 @@ form.onsubmit = (e) => {
   formData.append('appliance', form.electronico.value)
   const optionsArr = []
   let i = 0
-  // eslint-disable-next-line no-unused-vars
   for (const option of options) {
+    const update = option.className === '.option'
     // Appends value of text input
     optionsArr.push({
+      id: option.id,
       name: eval('form.nombreOpt' + i + '.value'),
-      price: eval('form.precioOpt' + i + '.value')
+      price: eval('form.precioOpt' + i + '.value'),
+      update
     })
     if (true) {
       const file = eval('form.imagenOpt' + i)
@@ -201,10 +209,9 @@ form.onsubmit = (e) => {
   }
   const optionsJson = JSON.stringify(optionsArr)
   formData.append('options', optionsJson)
-  insertPart(formData)
-//   if (id > 0) {
-//     updatePart(formData)
-//   } else {
-//     insertPart(formData)
-//   }
+  if (id > 0) {
+    updatePart(id, formData)
+  } else {
+    insertPart(formData)
+  }
 }

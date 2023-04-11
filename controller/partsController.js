@@ -100,7 +100,7 @@ module.exports.addPart = async (req, res) => {
       const options = JSON.parse(req.body.options)
       for (let i = 0; i < options.length; i++) {
         // Si se ha insertado una imagen la subimos a la bbdd
-        if (req.files.length > 0) {
+        if (req.files[i] !== undefined) {
           const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `imagen`, `precio`, `id_pieza`) VALUES (?,?,?,?)'
           await con.query(queryOption, [options[i].name, req.files[i].filename, options[i].price, partId])
         } else {
@@ -116,10 +116,8 @@ module.exports.addPart = async (req, res) => {
     } catch (error) {
       await connection.rollback()
       // Borramos todas las imagenes
-      if (req.files.length > 0) {
-        for (let i = 0; i < JSON.parse(req.body.options).length; i++) {
-          deleteFile(path.join(process.cwd(), '/public/images/parts/', req.files[i].filename))
-        }
+      for (let i = 0; i < JSON.parse(req.body.options).length; i++) {
+        deleteFile(path.join(process.cwd(), '/public/images/parts/', req.files[i].filename))
       }
 
       console.log(error)
@@ -130,48 +128,61 @@ module.exports.addPart = async (req, res) => {
 
 module.exports.editPart = async (req, res) => {
   const partId = req.params.category || 0
-  if (typeof req.body === 'undefined') {
-    res.json({
-      status: 'error',
-      message: 'data is undefined'
-    })
-  } else {
-    const connection = await con.getConnection()
-    // Hacemos una transaccion para poder insertar tanto como las piezas como las opciones
-    try {
-      await connection.beginTransaction()
-      // Editamos la pieza la pieza
-      const query1 = 'UPDATE `piezas` SET `nombre`=?,`descripcion`=?,`garantia`=?,`advertencia`=?,`nota`=?,`id_categoria`=?,`id_electrodomestico`=? WHERE `id_pieza`=?'
-      const result1 = await con.query(query1,
-        [req.body.name, req.body.description, req.body.warranty, req.body.warning, req.body.note, req.body.category, req.body.appliance])
-      const partId = result1[0].insertId
-      const options = JSON.parse(req.body.options)
-      for (let i = 0; i < options.length; i++) {
-        // Si se ha insertado una imagen la subimos a la bbdd
-        if (req.files.length > 0) {
-          const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `imagen`, `precio`, `id_pieza`) VALUES (?,?,?,?)'
-          await con.query(queryOption, [options[i].name, req.files[i].filename, options[i].price, partId])
-        } else {
-          const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `precio`, `id_pieza`) VALUES (?,?,?)'
-          await con.query(queryOption, [options[i].name, options[i].price, partId])
+  console.log(req.files === undefined, req.body)
+  if (partId > 0) {
+    if (typeof req.body === 'undefined') {
+      res.json({
+        status: 'error',
+        message: 'data is undefined'
+      })
+    } else {
+      const connection = await con.getConnection()
+      // Hacemos una transaccion para poder insertar tanto como las piezas como las opciones
+      try {
+        await connection.beginTransaction()
+        // Editamos la pieza la pieza
+        const query1 = 'UPDATE `piezas` SET `nombre`=?,`descripcion`=?,`garantia`=?,`advertencia`=?,`nota`=?,`id_categoria`=?,`id_electrodomestico`=? WHERE `id_pieza`=?'
+        await con.query(query1,
+          [req.body.name, req.body.description, req.body.warranty, req.body.warning, req.body.note, req.body.category, req.body.appliance, partId])
+        const options = JSON.parse(req.body.options)
+        for (let i = 0; i < options.length; i++) {
+          // Comprobamos si la opcion tiene que ser insertada o actualizada
+          if (options[i].update) {
+            // Si se ha insertado una imagen la subimos a la bbdd
+            if (req.files[i] !== undefined) {
+              const queryOption = 'UPDATE `piezas` SET `nombre`=?,`imagen`=?,`precio`=?,`id_pieza`=? WHERE `id_opcion`=?'
+              await con.query(queryOption, [options[i].name, req.files[i].filename, options[i].price, partId, options[i].id])
+            } else {
+              const queryOption = 'UPDATE `piezas` SET `nombre`=?,`precio`=?,`id_pieza`=? WHERE `id_opcion`=?'
+              await con.query(queryOption, [options[i].name, options[i].price, partId, options[i].id])
+            }
+          } else {
+            if (req.files[i] !== undefined) {
+              const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `imagen`, `precio`, `id_pieza`) VALUES (?,?,?,?)'
+              await con.query(queryOption, [options[i].name, req.files[i].filename, options[i].price, partId])
+            } else {
+              const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `precio`, `id_pieza`) VALUES (?,?,?)'
+              await con.query(queryOption, [options[i].name, options[i].price, partId])
+            }
+          }
         }
-      }
 
-      // Devolvemos el json del producto añadido si todo esta bien (reutilizamos codigo)
-      res.send(await getPartSql(partId))
-      await connection.commit()
-      // Si da error la insercion, borramos la imagen y hacemos un rollback a la transaccion
-    } catch (error) {
-      await connection.rollback()
-      // Borramos todas las imagenes
-      if (req.files.length > 0) {
-        for (let i = 0; i < JSON.parse(req.body.options).length; i++) {
-          deleteFile(path.join(process.cwd(), '/public/images/parts/', req.files[i].filename))
+        // Devolvemos el json del producto añadido si todo esta bien (reutilizamos codigo)
+        res.send(await getPartSql(partId))
+        await connection.commit()
+        // Si da error la insercion, borramos la imagen y hacemos un rollback a la transaccion
+      } catch (error) {
+        await connection.rollback()
+        // Borramos todas las imagenes
+        if (req.files !== undefined) {
+          for (let i = 0; i < JSON.parse(req.body.options).length; i++) {
+            deleteFile(path.join(process.cwd(), '/public/images/parts/', req.files[i].filename))
+          }
         }
-      }
 
-      console.log(error)
-      res.status(400).send({ error: 'insert failed' })
+        console.log(error)
+        res.status(400).send({ error: 'insert failed' })
+      }
     }
   }
 }
