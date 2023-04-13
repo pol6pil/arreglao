@@ -16,7 +16,7 @@ function showAppliance (div, appliance) {
   divAppliance.className = 'appliance'
 
   const a = document.createElement('a')
-  a.setAttribute('href', `./productsAppliance?id=${appliance.id}.html`)
+  a.setAttribute('href', `./products.html?appliance=${appliance.id}`)
 
   const adiv = document.createElement('div')
   const h3 = document.createElement('h3')

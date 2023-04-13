@@ -81,7 +81,6 @@ module.exports.getPart = async (req, res) => {
   }
 }
 module.exports.addPart = async (req, res) => {
-  console.log(req.body, 'a', req.files)
   if (typeof req.body === 'undefined') {
     res.json({
       status: 'error',
@@ -98,14 +97,17 @@ module.exports.addPart = async (req, res) => {
         [req.body.name, req.body.description, req.body.warranty, req.body.warning, req.body.note, req.body.category, req.body.appliance])
       const partId = result1[0].insertId
       const options = JSON.parse(req.body.options)
-      for (let i = 0; i < options.length; i++) {
+      // Creamos un indice para recorrer los archivos de las opciones
+      let fileIndex = 0
+      for (const option of options) {
         // Si se ha insertado una imagen la subimos a la bbdd
-        if (req.files[i] !== undefined) {
+        if (option.imageUpload) {
           const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `imagen`, `precio`, `id_pieza`) VALUES (?,?,?,?)'
-          await con.query(queryOption, [options[i].name, req.files[i].filename, options[i].price, partId])
+          await con.query(queryOption, [option.name, req.files[fileIndex].filename, option.price, partId])
+          fileIndex++
         } else {
           const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `precio`, `id_pieza`) VALUES (?,?,?)'
-          await con.query(queryOption, [options[i].name, options[i].price, partId])
+          await con.query(queryOption, [option.name, option.price, partId])
         }
       }
 
@@ -127,8 +129,7 @@ module.exports.addPart = async (req, res) => {
 }
 
 module.exports.editPart = async (req, res) => {
-  const partId = req.params.category || 0
-  console.log(req.files === undefined, req.body)
+  const partId = req.params.id || 0
   if (partId > 0) {
     if (typeof req.body === 'undefined') {
       res.json({
@@ -145,24 +146,45 @@ module.exports.editPart = async (req, res) => {
         await con.query(query1,
           [req.body.name, req.body.description, req.body.warranty, req.body.warning, req.body.note, req.body.category, req.body.appliance, partId])
         const options = JSON.parse(req.body.options)
-        for (let i = 0; i < options.length; i++) {
+
+        // Creamos un indice para recorrer los archivos de las opciones
+        let fileIndex = 0
+        for (const option of options) {
           // Comprobamos si la opcion tiene que ser insertada o actualizada
-          if (options[i].update) {
+          if (option.update) {
             // Si se ha insertado una imagen la subimos a la bbdd
-            if (req.files[i] !== undefined) {
-              const queryOption = 'UPDATE `piezas` SET `nombre`=?,`imagen`=?,`precio`=?,`id_pieza`=? WHERE `id_opcion`=?'
-              await con.query(queryOption, [options[i].name, req.files[i].filename, options[i].price, partId, options[i].id])
+            if (option.imageUpload) {
+              // Obtenemos la imagen antes de modificar las opciones para luego poder borrar la imagen
+              const imgUrl = getOptionImage(option.id)
+              // Actualizamos la opcion en la bbdd
+              const queryOption = `UPDATE opciones_piezas SET nombre='${option.name}',imagen='${req.files[fileIndex].filename}',precio=${option.price} WHERE id_opcion=${option.id}`
+              await con.query(queryOption)
+              fileIndex++
+              // Borramos la imagen anterior
+              deleteFile(path.join(process.cwd(), '/public/images/parts/', imgUrl))
             } else {
-              const queryOption = 'UPDATE `piezas` SET `nombre`=?,`precio`=?,`id_pieza`=? WHERE `id_opcion`=?'
-              await con.query(queryOption, [options[i].name, options[i].price, partId, options[i].id])
+              const queryOption = `UPDATE opciones_piezas SET nombre='${option.name}', precio=${option.price} WHERE id_opcion=${option.id}`
+              await con.query(queryOption)
             }
+            // Comprobamos si la opcion se tiene que borrar
+          } else if (option.isDelete) {
+            // Obtenemos la imagen para poder borrarla
+            const imgUrl = await getOptionImage(option.id)
+            console.log(imgUrl)
+
+            // Borramos la opcion
+            await deleteOption(option.id)
+
+            // Borramos la imagen
+            deleteFile(path.join(process.cwd(), '/public/images/parts/', imgUrl))
           } else {
-            if (req.files[i] !== undefined) {
+            if (option.imageUpload) {
               const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `imagen`, `precio`, `id_pieza`) VALUES (?,?,?,?)'
-              await con.query(queryOption, [options[i].name, req.files[i].filename, options[i].price, partId])
+              await con.query(queryOption, [option.name, req.files[fileIndex].filename, option.price, partId])
+              fileIndex++
             } else {
               const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `precio`, `id_pieza`) VALUES (?,?,?)'
-              await con.query(queryOption, [options[i].name, options[i].price, partId])
+              await con.query(queryOption, [option.name, option.price, partId])
             }
           }
         }
@@ -174,8 +196,8 @@ module.exports.editPart = async (req, res) => {
       } catch (error) {
         await connection.rollback()
         // Borramos todas las imagenes
-        if (req.files !== undefined) {
-          for (let i = 0; i < JSON.parse(req.body.options).length; i++) {
+        for (let i = 0; i < JSON.parse(req.body.options).length; i++) {
+          if (req.files[i] !== undefined) {
             deleteFile(path.join(process.cwd(), '/public/images/parts/', req.files[i].filename))
           }
         }
@@ -196,4 +218,16 @@ async function getPartSql (id) {
 
   const row = sqlResponse[0]
   return part.toJson(row[0], options[0])
+}
+
+async function getOptionImage (id) {
+  // Consulta a la bbdd con la opcion
+  const sqlResponse = await con.query('SELECT imagen FROM opciones_piezas WHERE id_opcion = ?', [id])
+  return sqlResponse[0][0].imagen
+}
+
+async function deleteOption (id) {
+  // Consulta a la bbdd con la opcion
+  const sqlResponse = await con.query('DELETE FROM opciones_piezas WHERE id_opcion = ?', [id])
+  console.log(sqlResponse)
 }

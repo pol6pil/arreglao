@@ -6,7 +6,7 @@ module.exports.toJson = (row, rawOptions) => {
   for (const option of rawOptions) {
     options.push(
       {
-        id: option.id,
+        id: option.id_opcion,
         name: option.nombre,
         imgUrl: `http://127.0.0.1:80/images/parts/${option.imagen}`,
         price: option.precio,

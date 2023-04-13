@@ -74,14 +74,16 @@ async function showPart (id, form) {
   // Mostramos las opciones de la parte
   // eslint-disable-next-line no-unused-vars
   for (const option of json.options) {
-    addOptionForm(options, true)
+    console.log(option)
+    addOptionForm(options, true, option.id)
     eval('form.nombreOpt' + options + '.value = option.name')
     eval('form.precioOpt' + options + '.value = option.price')
     options++
   }
 }
 // Evento del boton para generar un formulario de opcion
-function addOptionForm (id, isUpdate) {
+function addOptionForm (i, isUpdate, id) {
+  console.log(id)
   // Generamos el div de la opcion
   const optionsDiv = document.querySelector('#options')
   const optionDiv = document.createElement('div')
@@ -92,12 +94,12 @@ function addOptionForm (id, isUpdate) {
   const nombreDiv = document.createElement('div')
 
   const nombreLabel = document.createElement('label')
-  nombreLabel.for = `nombreOpt${id}`
+  nombreLabel.for = `nombreOpt${i}`
   nombreLabel.append('Nombre:')
   nombreDiv.append(nombreLabel)
 
   const nombreInput = document.createElement('input')
-  nombreInput.name = `nombreOpt${id}`
+  nombreInput.name = `nombreOpt${i}`
   nombreInput.type = 'text'
   nombreInput.required = true
   nombreDiv.append(nombreInput)
@@ -108,15 +110,20 @@ function addOptionForm (id, isUpdate) {
   const imagenDiv = document.createElement('div')
 
   const imagenLabel = document.createElement('label')
-  imagenLabel.for = `imagenOpt${id}`
+  imagenLabel.for = `imagenOpt${i}`
   imagenLabel.append('Imagen:')
   imagenDiv.append(imagenLabel)
 
   const imagenInput = document.createElement('input')
-  imagenInput.name = `imagenOpt${id}`
+  imagenInput.name = `imagenOpt${i}`
   imagenInput.type = 'file'
   imagenInput.accept = 'image/*'
   imagenDiv.append(imagenInput)
+
+  // Si la imagen no se actualiza es obligatoria
+  if (!isUpdate) {
+    imagenInput.required = true
+  }
 
   optionDiv.append(imagenDiv)
 
@@ -124,20 +131,47 @@ function addOptionForm (id, isUpdate) {
   const precioDiv = document.createElement('div')
 
   const precioLabel = document.createElement('label')
-  precioLabel.for = `precioOpt${id}`
+  precioLabel.for = `precioOpt${i}`
   precioLabel.append('Precio:')
   precioDiv.append(precioLabel)
 
   const precioInput = document.createElement('input')
-  precioInput.name = `precioOpt${id}`
+  precioInput.name = `precioOpt${i}`
   precioInput.type = 'number'
   precioInput.step = '.01'
   precioInput.required = true
   precioDiv.append(precioInput)
 
   optionDiv.append(precioDiv)
+
+  // Creacion del boton para eliminar la opcion
+  const eraseButton = document.createElement('button')
+  eraseButton.type = 'button'
+  eraseButton.append('X')
+  eraseButton.className = 'eraseButton'
+  optionDiv.append(eraseButton)
+
   if (isUpdate) {
     optionDiv.className = 'optionUpdate'
+  }
+  // Si la opcion ya es existente le asignamos un id
+  if (id) {
+    optionDiv.id = id
+  }
+
+  // Evento para borrar la opcion
+  eraseButton.onclick = (e) => {
+    // Si el contenedor es de clase optionUpdate no lo borraremos de la interfaz si no que se ocultara para luego
+    // Poder acceder a sus datos para realizar la consulta de delete
+    let div = e.target.closest('.optionUpdate')
+    if (div !== null) {
+      div.style.display = 'none'
+    }
+    // Si el contenedor es de clase option lo eliminaremos de la interfaz
+    div = e.target.closest('.option')
+    if (div !== null) {
+      div.remove()
+    }
   }
 
   optionsDiv.append(optionDiv)
@@ -192,22 +226,35 @@ form.onsubmit = (e) => {
   const optionsArr = []
   let i = 0
   for (const option of options) {
-    const update = option.className === '.option'
+    const file = eval('form.imagenOpt' + i)
+    // Si la opcion se tiene que actualizar porque ya existia lo marcamos
+    let update = option.className === 'optionUpdate'
+    // Si la opcion ha sido borrada de la interfaz
+    const isDelete = option.style.display === 'none'
+
+    if (isDelete) {
+      update = false
+    }
+    // Si la opcion tiene que actualizar la imagen
+    const imageUpload = file.files[0] !== undefined
+    if (imageUpload && !isDelete) {
+      formData.append('files', file.files[0])
+    }
     // Appends value of text input
     optionsArr.push({
       id: option.id,
       name: eval('form.nombreOpt' + i + '.value'),
       price: eval('form.precioOpt' + i + '.value'),
-      update
+      update,
+      imageUpload,
+      isDelete
     })
-    if (true) {
-      const file = eval('form.imagenOpt' + i)
-      formData.append('files', file.files[0])
-      console.log(file.files)
-    }
+    console.log(optionsArr)
+
     i++
   }
   const optionsJson = JSON.stringify(optionsArr)
+  console.log(optionsJson)
   formData.append('options', optionsJson)
   if (id > 0) {
     updatePart(id, formData)

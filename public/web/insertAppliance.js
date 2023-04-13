@@ -2,7 +2,6 @@
 // Formulario para insertar un electrodomestico
 const form = document.forms.appliance
 
-console.log(form)
 
 form.onsubmit = (e) => {
   e.preventDefault()
