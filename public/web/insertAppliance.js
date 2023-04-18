@@ -2,7 +2,6 @@
 // Formulario para insertar un electrodomestico
 const form = document.forms.appliance
 
-
 form.onsubmit = (e) => {
   e.preventDefault()
   const file = form.imagen

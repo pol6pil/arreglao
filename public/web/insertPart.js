@@ -45,7 +45,6 @@ async function insertPart (formData) {
   console.log(json)
 }
 async function updatePart (id, formData) {
-  console.log(id, formData)
   const res = await fetch(`http://localhost/parts/${id}`, {
     method: 'PUT',
     body: formData // Payload is formData object

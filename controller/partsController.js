@@ -7,25 +7,18 @@ const path = require('path')
 // Funcionalidades de la api respecto a piezas
 module.exports.getAllParts = async (req, res) => {
   const limit = Number(req.query.limit) || 0
-  const orderBy = req.query.orderBy || undefined
-  const sort = req.query.sort || undefined
 
   // Conexion a la bbdd
   // Almacenamos la consulta en un string para luego modificarlo
   let consult = 'SELECT * FROM piezas'
+  const queryColumns = []
   // Si tiene limite la consulta se lo añadimos al string
   if (limit > 0) {
     consult += ' LIMIT ?'
-  }
-  // Si tiene que ordernarse por alguna columna se añade al string
-  if (orderBy !== undefined) {
-    consult += ' ORDER BY ?'
-    if (sort === 'DESC') {
-      consult += ' DESC'
-    }
+    queryColumns.push(limit)
   }
   // Consulta a la bbdd con la consulta almacenada
-  const sqlResponse = await con.query(consult, [limit, orderBy])
+  const sqlResponse = await con.query(consult, queryColumns)
 
   // Obtencion de las filas devueltas
   const rows = sqlResponse[0]
@@ -40,33 +33,69 @@ module.exports.getAllParts = async (req, res) => {
   res.send(rowsJson)
 }
 
+module.exports.getAllPartsInAppliance = async (req, res) => {
+  const limit = Number(req.params.limit) || 0
+  const appliance = req.params.appliance || 0
+
+  if (appliance > 0) {
+    // Conexion a la bbdd
+    // Almacenamos la consulta en un string para luego modificarlo
+    let consult = 'SELECT * FROM piezas WHERE id_electrodomestico = ?'
+    const queryColumns = []
+    queryColumns.push(appliance)
+    // Si tiene limite la consulta se lo añadimos al string
+    if (limit > 0) {
+      consult += ' LIMIT ?'
+      queryColumns.push(limit)
+    }
+    // Consulta a la bbdd con la consulta almacenada
+    const sqlResponse = await con.query(consult, queryColumns)
+    // Obtencion de las filas devueltas
+    const rows = sqlResponse[0]
+    // Procesamos las filas para poder enviarlas
+    const rowsJson = []
+    for (const row of rows) {
+      // Consula a la bbdd de las opciones de la pieza
+      const options = await con.query('SELECT * FROM opciones_piezas WHERE id_pieza = ?', [row.id_pieza])
+      rowsJson.push(part.toJson(row, options[0]))
+    }
+    res.send(rowsJson)
+  } else {
+    // Si el id no es valido enviamos un error
+    res.status(400).send({ error: 'invalid id' })
+  }
+}
+
 module.exports.getAllPartsInCategory = async (req, res) => {
   const limit = Number(req.query.limit) || 0
-  const orderBy = req.query.orderBy || undefined
-  const sort = req.query.sort || undefined
   const category = req.params.category || 0
 
   if (category > 0) {
     // Conexion a la bbdd
     // Almacenamos la consulta en un string para luego modificarlo
     let consult = 'SELECT * FROM piezas WHERE id_categoria = ?'
+    const queryColumns = []
+    queryColumns.push(category)
     // Si tiene limite la consulta se lo añadimos al string
     if (limit > 0) {
       consult += ' LIMIT ?'
-    }
-    // Si tiene que ordernarse por alguna columna se añade al string
-    if (orderBy !== undefined) {
-      consult += ' ORDER BY ?'
-      if (sort === 'DESC') {
-        consult += ' DESC'
-      }
+      queryColumns.push(limit)
     }
     // Consulta a la bbdd con la consulta almacenada
-    const sqlResponse = await con.query(consult, [category, limit, orderBy])
-
-    res.send(sqlResponse[0])
+    const sqlResponse = await con.query(consult, queryColumns)
+    // Obtencion de las filas devueltas
+    const rows = sqlResponse[0]
+    // Procesamos las filas para poder enviarlas
+    const rowsJson = []
+    for (const row of rows) {
+      // Consula a la bbdd de las opciones de la pieza
+      const options = await con.query('SELECT * FROM opciones_piezas WHERE id_pieza = ?', [row.id_pieza])
+      rowsJson.push(part.toJson(row, options[0]))
+    }
+    res.send(rowsJson)
   } else {
-    res.send({})
+    // Si el id no es valido enviamos un error
+    res.status(400).send({ error: 'invalid id' })
   }
 }
 
@@ -77,7 +106,8 @@ module.exports.getPart = async (req, res) => {
   if (id > 0) {
     res.send(await getPartSql(id))
   } else {
-    res.send({})
+    // Si el id no es valido enviamos un error
+    res.status(400).send({ error: 'invalid id' })
   }
 }
 module.exports.addPart = async (req, res) => {
@@ -155,7 +185,7 @@ module.exports.editPart = async (req, res) => {
             // Si se ha insertado una imagen la subimos a la bbdd
             if (option.imageUpload) {
               // Obtenemos la imagen antes de modificar las opciones para luego poder borrar la imagen
-              const imgUrl = getOptionImage(option.id)
+              const imgUrl = await getOptionImage(option.id)
               // Actualizamos la opcion en la bbdd
               const queryOption = `UPDATE opciones_piezas SET nombre='${option.name}',imagen='${req.files[fileIndex].filename}',precio=${option.price} WHERE id_opcion=${option.id}`
               await con.query(queryOption)
@@ -170,7 +200,6 @@ module.exports.editPart = async (req, res) => {
           } else if (option.isDelete) {
             // Obtenemos la imagen para poder borrarla
             const imgUrl = await getOptionImage(option.id)
-            console.log(imgUrl)
 
             // Borramos la opcion
             await deleteOption(option.id)

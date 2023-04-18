@@ -42,6 +42,7 @@ function checkFileType (file, cb) {
 router.get('/', part.getAllParts)
 // router.get('/categories', part.getPartCategories)
 router.get('/category/:category', part.getAllPartsInCategory)
+router.get('/appliance/:appliance', part.getAllPartsInAppliance)
 router.get('/:id', part.getPart)
 router.post('/', upload.array('files'), part.addPart)
 router.put('/:id', upload.array('files'), part.editPart)

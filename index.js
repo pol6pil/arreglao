@@ -32,7 +32,7 @@ app.use(cors({
 app.use('/parts', partsRoute)
 app.use('/appliances', appliancesRoute)
 app.use('/categories', categoriesRoute)
-app.use('/img', imgRoute)
+app.use('/images', imgRoute)
 
 // Escucha al puerto
 app.listen(PORT, () => console.log(`Server iniciado en puerto ${PORT}`))
