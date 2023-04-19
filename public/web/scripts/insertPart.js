@@ -185,7 +185,7 @@ const id = urlParams.get('id') || 0
 
 // Si el usuario no es una admin, le redirigimos a otra pagina
 if (!isAdmin) {
-  window.location.href = './parts.html'
+  window.location.href = './error.html'
 }
 
 const form = document.forms.pieza

@@ -232,7 +232,7 @@ module.exports.editPart = async (req, res) => {
         }
 
         console.log(error)
-        res.status(400).send({ error: 'insert failed' })
+        res.status(400).send({ error: 'update failed' })
       }
     }
   }

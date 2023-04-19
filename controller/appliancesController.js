@@ -46,37 +46,76 @@ module.exports.getAppliance = async (req, res) => {
   if (id > 0) {
     res.send(await getApplianceSql(id))
   } else {
-    res.send({})
+    res.status(400).send({ error: 'invalid id' })
   }
 }
 module.exports.addAppliance = async (req, res) => {
-  console.log(req.body, 'a', req.body.files[0])
   if (typeof req.body === 'undefined') {
     res.json({
       status: 'error',
       message: 'data is undefined'
     })
   } else {
-    const connection = await con.getConnection()
-    // Hacemos una transaccion para poder insertar tanto como las piezas como las opciones
     try {
-      await connection.beginTransaction()
-      // Insertamos la pieza
+      // Insertamos el electrodomestico
       const query = 'INSERT INTO `electrodomestico`(`nombre`, `imagen`) VALUES (?,?)'
       const result = await con.query(query,
-        [req.body.name, req.body.files.filename])
-      const partId = result[0].insertId
+        [req.body.name, req.files[0].filename])
+      const applianceId = result[0].insertId
       // Devolvemos el json del producto añadido si todo esta bien (reutilizamos codigo)
-      res.send(await getApplianceSql(partId))
+      res.send(await getApplianceSql(applianceId))
+    } catch (error) {
+      // Borramos la imagen si da error
+      deleteFile(path.join(process.cwd(), '/public/images/appliances/', req.files[0].filename))
+
+      console.log(error)
+      res.status(400).send({ error: 'insert failed' })
+    }
+  }
+}
+
+module.exports.editAppliance = async (req, res) => {
+  const applianceId = req.params.id || 0
+  if (typeof req.body === 'undefined' || applianceId === 0) {
+    res.json({
+      status: 'error',
+      message: 'data is undefined'
+    })
+  } else {
+    const connection = await con.getConnection()
+    // Hacemos una transaccion para poder actualizar el nombre y la imagen por separado en caso de que solo queramos actualizar 1 cosa
+    try {
+      // Si el body tiene una propiedad name la actualizamos
+      if (req.body.name !== 'undefined') {
+        // Actualizamos el electrodomestico
+        const query = 'UPDATE `electrodomestico` SET `nombre`=? WHERE id_electrodomestico = ?'
+        await con.query(query, [req.body.name, applianceId])
+      }
+      // Si la peticion tiene archivos actualizamos la imagen
+      if (req.files.length > 0) {
+        // Obtenemos la imagen antes de modificarla para luego poder borrar la imagen
+        const imgUrl = await getApplianceImageSql(applianceId)
+        // Actualizamos el electrodomestico
+        const query = 'UPDATE `electrodomestico` SET `imagen`=? WHERE id_electrodomestico = ?'
+        await con.query(query, [req.files[0].filename, applianceId])
+        // Borramos la imagen anterior si existe
+        if (imgUrl !== null) {
+          deleteFile(path.join(process.cwd(), '/public/images/appliances/', imgUrl))
+        }
+      }
+
+      // Devolvemos el json del producto añadido si todo esta bien (reutilizamos codigo)
+      res.send(await getApplianceSql(applianceId))
       await connection.commit()
       // Si da error la insercion, borramos la imagen y hacemos un rollback a la transaccion
     } catch (error) {
       await connection.rollback()
-      // Borramos todas la imagen
-      deleteFile(path.join(process.cwd(), '/public/images/appliances/', req.body.files.filename))
-
       console.log(error)
-      res.status(400).send({ error: 'insert failed' })
+      // Borramos la imagen
+      if (req.files.length > 0) {
+        deleteFile(path.join(process.cwd(), '/public/images/appliances/', req.files[0].filename))
+      }
+      res.status(400).send({ error: 'update failed' })
     }
   }
 }
@@ -87,4 +126,11 @@ async function getApplianceSql (id) {
   // Procesamos la respuesta para poder enviarlas
   const row = sqlResponse[0]
   return appliance.toJson(row[0])
+}
+
+async function getApplianceImageSql (id) {
+  // Consulta a la bbdd a la pieza con el id
+  const sqlResponse = await con.query('SELECT imagen FROM electrodomestico WHERE id_electrodomestico = ?', [id])
+  // Procesamos la respuesta para poder enviarlas
+  return sqlResponse[0][0].imagen
 }

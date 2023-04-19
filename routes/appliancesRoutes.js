@@ -42,7 +42,7 @@ router.get('/', appliance.getAllAppliances)
 // router.get('/categories', part.getPartCategories)
 router.get('/:id', appliance.getAppliance)
 router.post('/', upload.array('files'), appliance.addAppliance)
-// router.put('/:id', part.editPart)
+router.put('/:id', upload.array('files'), appliance.editAppliance)
 // router.delete('/:id', part.deletePart)
 
 module.exports = router

@@ -5,6 +5,6 @@ module.exports.toJson = (appliance) => {
   return {
     id: appliance.id_electrodomestico,
     name: appliance.nombre,
-    imgUrl: `http://127.0.0.1:80/img/appliances/${appliance.imagen}`
+    imgUrl: `http://127.0.0.1:80/images/appliances/${appliance.imagen}`
   }
 }
