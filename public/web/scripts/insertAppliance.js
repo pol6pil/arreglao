@@ -22,7 +22,7 @@ async function showAppliance (id, form, divImg) {
   form.nombre.value = json.name
   const img = document.createElement('img')
 
-  img.setAttribute('scr', json.imgUrl)
+  img.setAttribute('src', json.imgUrl)
 
   img.alt = json.name
   divImg.append(img)

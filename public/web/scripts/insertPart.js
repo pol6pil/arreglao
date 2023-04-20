@@ -71,22 +71,38 @@ async function showPart (id, form) {
   form.categoria.selectedIndex = json.category - 1
 
   // Mostramos las opciones de la parte
-  // eslint-disable-next-line no-unused-vars
+
+  let optionsQuantity = 0
   for (const option of json.options) {
-    console.log(option)
-    addOptionForm(options, true, option.id)
-    eval('form.nombreOpt' + options + '.value = option.name')
-    eval('form.precioOpt' + options + '.value = option.price')
-    options++
+    addOptionForm(optionsQuantity, true, option.id)
+    eval('form.nombreOpt' + optionsQuantity + '.value = option.name')
+    eval('form.precioOpt' + optionsQuantity + '.value = option.price')
+
+    // Mostramos la imagen
+    const optionImg = document.createElement('img')
+    optionImg.setAttribute('src', option.imgUrl)
+
+    const imageDiv = document.querySelector(`#option${optionsQuantity}Image`)
+    imageDiv.append(optionImg)
+    optionsQuantity++
   }
 }
 // Evento del boton para generar un formulario de opcion
 function addOptionForm (i, isUpdate, id) {
-  console.log(id)
   // Generamos el div de la opcion
   const optionsDiv = document.querySelector('#options')
   const optionDiv = document.createElement('div')
   optionDiv.className = 'option'
+
+  // Si la opcion existe mostramos la imagen generamos un div en el que poner la imagen
+  if (isUpdate) {
+    const imageDiv = document.createElement('div')
+    imageDiv.id = `option${i}Image`
+    optionDiv.append(imageDiv)
+  }
+
+  // Contenemos el formulario del option en un div
+  const optionForm = document.createElement('div')
 
   // Generamos los campos de la opcion
   // Nombre
@@ -103,7 +119,7 @@ function addOptionForm (i, isUpdate, id) {
   nombreInput.required = true
   nombreDiv.append(nombreInput)
 
-  optionDiv.append(nombreDiv)
+  optionForm.append(nombreDiv)
 
   // Imagen
   const imagenDiv = document.createElement('div')
@@ -124,7 +140,7 @@ function addOptionForm (i, isUpdate, id) {
     imagenInput.required = true
   }
 
-  optionDiv.append(imagenDiv)
+  optionForm.append(imagenDiv)
 
   // Precio
   const precioDiv = document.createElement('div')
@@ -141,7 +157,8 @@ function addOptionForm (i, isUpdate, id) {
   precioInput.required = true
   precioDiv.append(precioInput)
 
-  optionDiv.append(precioDiv)
+  optionForm.append(precioDiv)
+  optionDiv.append(optionForm)
 
   // Creacion del boton para eliminar la opcion
   const eraseButton = document.createElement('button')
@@ -194,7 +211,7 @@ const appliances = form.querySelector('#appliances')
 showCategories(categories)
 showAppliances(appliances)
 const addOptionButton = document.querySelector('#addOptionButton')
-let options = 0
+let optionsQuantity = 0
 
 // Si tiene una id, se muestran los datos de la parte
 if (id > 0) {
@@ -203,8 +220,8 @@ if (id > 0) {
 
 // Creacion de los select de categorias
 addOptionButton.onclick = function (e) {
-  addOptionForm(options)
-  options++
+  addOptionForm(optionsQuantity)
+  optionsQuantity++
 }
 
 // Evento submit del formulario
