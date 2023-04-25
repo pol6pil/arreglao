@@ -211,6 +211,25 @@ window.onclick = (e) => {
   }
 }
 
+const CryptoJS = require('crypto-js')
+
+const encrypt = (text) => {
+  return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(text))
+}
+
+const decrypt = (data) => {
+  return CryptoJS.enc.Base64.parse(data).toString(CryptoJS.enc.Utf8)
+}
+const pass = encrypt('hola')
+
+console.log(pass)
+
+console.log(decrypt(pass))
+
+console.log(decrypt(pass) === 'hola')
+
+console.log(encrypt('hola') === pass)
+
 // Evento onclick de los elementos del dropdown
 const dropdowns = document.querySelectorAll('#ordenarPorDropdown p')
 for (const dropdown of dropdowns) {
