@@ -23,7 +23,12 @@ module.exports.login = async (req, res) => {
     console.log(password)
     console.log(salt)
     const hashedPass = await bcrypt.hash(password, salt)
+    const salt2 = await bcrypt.genSalt()
+    console.log(salt)
+    const hashedPass2 = await bcrypt.hash(password, salt)
     console.log(hashedPass)
+    console.log(hashedPass2)
+    console.log(await bcrypt.compare(password, hashedPass2))
   } catch (error) {
     console.log(error)
   }

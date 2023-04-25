@@ -111,6 +111,7 @@ module.exports.getPart = async (req, res) => {
   }
 }
 module.exports.addPart = async (req, res) => {
+  console.log(req.body)
   if (typeof req.body === 'undefined') {
     res.json({
       status: 'error',

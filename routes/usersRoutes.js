@@ -40,7 +40,7 @@ function checkFileType (file, cb) {
 
 // Rutas de pieza
 // router.get('/categories', part.getPartCategories)
-router.post('/login', user.login)
+router.post('/login', upload.array('files'), user.login)
 router.get('/getProfilePicture/:email', user.getPfp)
 router.post('/', user.register)
 router.put('/:email', upload.array('files'), user.update)
