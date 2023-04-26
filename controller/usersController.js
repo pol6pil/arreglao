@@ -1,6 +1,6 @@
 'use strict'
 
-// const part = require('../model/user')
+const user = require('../model/user')
 const con = require('../middleware/sqlconnection')
 const deleteFile = require('../middleware/deleteFile')
 const path = require('path')
@@ -33,12 +33,12 @@ module.exports.login = async (req, res) => {
     console.log(error)
   }
   // Conexion a la bbdd
-  // Almacenamos la consulta en un string para luego modificarlo
+  // Almacenamos la consulta en un string
   const consult = 'SELECT * FROM usuarios WHERE email = ?'
   // Consulta a la bbdd con la consulta almacenada
   const sqlResponse = await con.query(consult, email)
   // Obtencion del usuario devuelto
-  // const row = sqlResponse[0]
+  const row = sqlResponse[0]
   // Comprobamos si la contraseña es valida
 
   // res.send(rowsJson)
@@ -77,51 +77,33 @@ module.exports.getPfp = async (req, res) => {
 //   }
 }
 module.exports.register = async (req, res) => {
-//   if (typeof req.body === 'undefined') {
-//     res.json({
-//       status: 'error',
-//       message: 'data is undefined'
-//     })
-//   } else {
-//     const connection = await con.getConnection()
-//     // Hacemos una transaccion para poder insertar tanto como las piezas como las opciones
-//     try {
-//       await connection.beginTransaction()
-//       // Insertamos la pieza
-//       const query1 = 'INSERT INTO `piezas`(`nombre`, `descripcion`, `garantia`, `advertencia`, `nota`, `id_categoria`, `id_electrodomestico`) VALUES (?,?,?,?,?,?,?)'
-//       const result1 = await con.query(query1,
-//         [req.body.name, req.body.description, req.body.warranty, req.body.warning, req.body.note, req.body.category, req.body.appliance])
-//       const partId = result1[0].insertId
-//       const options = JSON.parse(req.body.options)
-//       // Creamos un indice para recorrer los archivos de las opciones
-//       let fileIndex = 0
-//       for (const option of options) {
-//         // Si se ha insertado una imagen la subimos a la bbdd
-//         if (option.imageUpload) {
-//           const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `imagen`, `precio`, `id_pieza`) VALUES (?,?,?,?)'
-//           await con.query(queryOption, [option.name, req.files[fileIndex].filename, option.price, partId])
-//           fileIndex++
-//         } else {
-//           const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `precio`, `id_pieza`) VALUES (?,?,?)'
-//           await con.query(queryOption, [option.name, option.price, partId])
-//         }
-//       }
+  const email = req.body.email || 0
+  const name = req.body.name || 0
+  const surname1 = req.body.surname1 || 0
+  const password = req.body.password || 0
 
-  //       // Devolvemos el json del producto añadido si todo esta bien (reutilizamos codigo)
-  //       res.send(await getPartSql(partId))
-  //       await connection.commit()
-  //       // Si da error la insercion, borramos la imagen y hacemos un rollback a la transaccion
-  //     } catch (error) {
-  //       await connection.rollback()
-  //       // Borramos todas las imagenes
-  //       for (let i = 0; i < JSON.parse(req.body.options).length; i++) {
-  //         deleteFile(path.join(process.cwd(), '/public/images/parts/', req.files[i].filename))
-  //       }
+  // Comprobamos que contiene los campos obligatorios
+  if (email === 0 || name === 0 || password === 0 || surname1 === 0) {
+    res.status(400).send({ error: 'incomplete form' })
+  }
 
-//       console.log(error)
-//       res.status(400).send({ error: 'insert failed' })
-//     }
-//   }
+  try {
+    // Generamos salt y encriptamos la contraseña
+    const salt = await bcrypt.genSalt()
+    const hashedPass = await bcrypt.hash(password, salt)
+    // Conexion a la bbdd
+    // Almacenamos la consulta en un string
+    const query = 'INSERT INTO `piezas`(`email`, `nombre`, `saldo`, `apellido1`, `apellido2`, `esAdmin`, `pass`) VALUES (?,?,?,?,?,?,?)'
+    // Consulta a la bbdd con la consulta almacenada
+    await con.query(query, [req.body.email, req.body.name, 0, surname1, req.body.surname2, false, hashedPass])
+
+    // Consultamos a la bbdd el usuario insertado para enviarlo como respuesta
+    const userSql = await getUser(email)
+    console.log(userSql)
+    res.send(user.toJson(userSql))
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 module.exports.update = async (req, res) => {
@@ -208,4 +190,9 @@ async function getOptionImage (id) {
   // Consulta a la bbdd con la opcion
   const sqlResponse = await con.query('SELECT imagen FROM opciones_piezas WHERE id_opcion = ?', [id])
   return sqlResponse[0][0].imagen
+}
+async function getUser (email) {
+  // Consulta a la bbdd con la opcion
+  const sqlResponse = await con.query('SELECT * FROM usuarios WHERE email = ?', [email])
+  return sqlResponse[0][0]
 }

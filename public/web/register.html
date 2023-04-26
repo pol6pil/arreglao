@@ -10,15 +10,31 @@
 <body>
     <form action="#" enctype="application/json" method="post" name="register">
         <div>
-            <label for="nombre">Nombre:</label>
-            <input required type="text" name="email"><br>
+            <label for="email">Correo electronico:</label>
+            <input required type="email" name="email"><br>
         </div>
         <div>
-            <label for="nombre">Nombre:</label>
-            <input required type="text" name="password"><br>
+            <label for="name">Nombre:</label>
+            <input required type="text" name="name"><br>
+        </div>
+        <div>
+            <label for="surname1">Primer apellido:</label>
+            <input required type="text" name="surname1"><br>
+        </div>
+        <div>
+            <label for="surname2">Segundo apellido:</label>
+            <input type="text" name="surname2"><br>
+        </div>
+        <div>
+            <label for="password">Contraseña:</label>
+            <input required type="password" name="password"><br>
+        </div>
+        <div>
+            <label for="password2">Repita la contraseña:</label>
+            <input required type="password" name="password2"><br>
         </div>
 
-        <input type="submit" value="Subir">
+        <input type="submit" value="Registrarse">
     </form>
 </body>
 </html>

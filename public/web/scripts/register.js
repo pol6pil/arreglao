@@ -1,5 +1,5 @@
 async function insertPart (formData) {
-  const res = await fetch('http://localhost/users/login', {
+  const res = await fetch('http://localhost/users/', {
     method: 'POST',
     body: formData // Payload is formData object
   })
@@ -11,6 +11,7 @@ const form = document.forms.register
 
 form.onsubmit = (e) => {
   e.preventDefault()
+  
   const formData = new FormData(form)
   insertPart(formData)
 }
