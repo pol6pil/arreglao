@@ -44,7 +44,7 @@ router.get('/', part.getAllParts)
 router.get('/category/:category', part.getAllPartsInCategory)
 router.get('/appliance/:appliance', part.getAllPartsInAppliance)
 router.get('/:id', part.getPart)
-router.post('/', upload.array('files'), part.addPart)
+router.post('/', part.addPart)
 router.put('/:id', upload.array('files'), part.editPart)
 // router.delete('/:id', part.deletePart)
 

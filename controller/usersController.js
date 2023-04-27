@@ -77,6 +77,7 @@ module.exports.getPfp = async (req, res) => {
 //   }
 }
 module.exports.register = async (req, res) => {
+  console.log(req.body)
   const email = req.body.email || 0
   const name = req.body.name || 0
   const surname1 = req.body.surname1 || 0
@@ -93,7 +94,7 @@ module.exports.register = async (req, res) => {
     const hashedPass = await bcrypt.hash(password, salt)
     // Conexion a la bbdd
     // Almacenamos la consulta en un string
-    const query = 'INSERT INTO `piezas`(`email`, `nombre`, `saldo`, `apellido1`, `apellido2`, `esAdmin`, `pass`) VALUES (?,?,?,?,?,?,?)'
+    const query = 'INSERT INTO `usuarios`(`email`, `nombre`, `saldo`, `apellido1`, `apellido2`, `esAdmin`, `pass`) VALUES (?,?,?,?,?,?,?)'
     // Consulta a la bbdd con la consulta almacenada
     await con.query(query, [req.body.email, req.body.name, 0, surname1, req.body.surname2, false, hashedPass])
 

@@ -42,7 +42,7 @@ function checkFileType (file, cb) {
 // router.get('/categories', part.getPartCategories)
 router.post('/login', upload.array('files'), user.login)
 router.get('/getProfilePicture/:email', user.getPfp)
-router.post('/', user.register)
+router.post('/', upload.array('files'), user.register)
 router.put('/:email', upload.array('files'), user.update)
 // router.delete('/:id', part.deletePart)
 

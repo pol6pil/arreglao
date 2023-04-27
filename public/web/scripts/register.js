@@ -3,8 +3,15 @@ async function insertPart (formData) {
     method: 'POST',
     body: formData // Payload is formData object
   })
-  const json = await res.json()
-  console.log(json)
+  if(res.ok){
+    console.log('todo ok')
+    const json = await res.json()
+    console.log(json)
+  }
+  else{
+    console.log('todo MAL')
+  }
+
 }
 
 function validatePassword () {
