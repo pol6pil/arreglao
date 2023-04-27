@@ -1,17 +1,18 @@
+'use strict'
+
+import * as userLogger from './generic/userLogger.js'
+_
 async function register (formData) {
-  const res = await fetch('http://localhost/users/login', {
+  const res = await fetch('http://localhost/users/', {
     method: 'POST',
     body: formData // Payload is formData object
   })
-  if(res.ok){
-    console.log('todo ok')
+  if (res.ok) {
     const json = await res.json()
-    console.log(json)
-  }
-  else{
+    userLogger(json.email, json.isAdmin)
+  } else {
     console.log('todo MAL')
   }
-
 }
 
 function validatePassword () {
