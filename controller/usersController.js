@@ -12,9 +12,9 @@ module.exports.login = async (req, res) => {
   const email = req.body.email || 0
   const password = req.body.password || 0
 
-  if (email === 0) {
+  if (email === 0 || password === 0) {
     // Si el email no es valido enviamos un error
-    res.status(400).send({ error: 'user not found' })
+    res.status(400).send({ error: 'incomplete form' })
   }
 
   // Generamos salt
@@ -23,14 +23,11 @@ module.exports.login = async (req, res) => {
     console.log(password)
     console.log(salt)
     const hashedPass = await bcrypt.hash(password, salt)
-    const salt2 = await bcrypt.genSalt()
-    console.log(salt)
-    const hashedPass2 = await bcrypt.hash(password, salt)
     console.log(hashedPass)
-    console.log(hashedPass2)
-    console.log(await bcrypt.compare(password, hashedPass2))
+    console.log()
   } catch (error) {
     console.log(error)
+    res.status(400).send({ error: 'login failed' })
   }
   // Conexion a la bbdd
   // Almacenamos la consulta en un string
@@ -38,10 +35,16 @@ module.exports.login = async (req, res) => {
   // Consulta a la bbdd con la consulta almacenada
   const sqlResponse = await con.query(consult, email)
   // Obtencion del usuario devuelto
-  const row = sqlResponse[0]
-  // Comprobamos si la contraseña es valida
+  const userJson = user.toJson(sqlResponse[0][0])
+  // Comprobamos si el usuario existe
+  if (userJson === null) {
 
-  // res.send(rowsJson)
+  } else if (await bcrypt.compare(password, userJson.password)) {
+    // Comprobamos si la contraseña es valida
+    res.send(userJson)
+  } else {
+    res.status(400).send({ error: 'invalid password' })
+  }
 }
 
 module.exports.getPfp = async (req, res) => {
@@ -100,10 +103,10 @@ module.exports.register = async (req, res) => {
 
     // Consultamos a la bbdd el usuario insertado para enviarlo como respuesta
     const userSql = await getUser(email)
-    console.log(userSql)
     res.send(user.toJson(userSql))
   } catch (error) {
     console.log(error)
+    res.status(400).send({ error: 'failed insert' })
   }
 }
 
