@@ -1,6 +1,4 @@
 'use strict'
-import * as userLogger from './generic/userLogger.js'
-
 async function login (formData) {
   const res = await fetch('http://localhost/users/login', {
     method: 'POST',
@@ -10,10 +8,31 @@ async function login (formData) {
   if (res.ok) {
     console.log('todo ok')
     // Iniciamos sesion
-    userLogger.saveUser(json.email, json.isAdmin)
+    // eslint-disable-next-line no-undef
+    saveUser(json.email, json.isAdmin)
   } else {
-    console.log(json.error)
+    clearErrors()
+    if (json.error === 'user not found') {
+      showError('Usuario no encontrado')
+    } else if (json.error === 'invalid password') {
+      showError('Contraseña invalida')
+    }
   }
+}
+
+function clearErrors () {
+  const errors = document.querySelectorAll('.error')
+  for (const error of errors) {
+    error.remove()
+  }
+}
+
+function showError (errorMsg) {
+  const form = document.forms.login
+  const errorSpan = document.createElement('span')
+  errorSpan.className = 'error'
+  errorSpan.append(errorMsg)
+  form.append(errorSpan)
 }
 
 const form = document.forms.login

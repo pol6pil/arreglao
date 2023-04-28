@@ -2,7 +2,12 @@
 
 // Mostramos el header de las paginas
 
-function mostrarHeader () {
+async function obtenerPfp (email) {
+  const res = await fetch(`http://localhost/users/${email}`)
+  return await res.json()
+}
+
+async function mostrarHeader () {
   const header = document.createElement('header')
   const aboutUs = document.createElement('a')
   aboutUs.setAttribute('href', './aboutUs.html')
@@ -43,6 +48,7 @@ function mostrarHeader () {
     header.append(register)
   } else {
     // Si el usuario esta logeado
+    const user = JSON.parse(window.localStorage.getItem('user'))
     const logoff = document.createElement('a')
     logoff.setAttribute('href', './index.html')
     logoff.onclick = () => { window.localStorage.removeItem('user') }
@@ -50,9 +56,12 @@ function mostrarHeader () {
     header.append(logoff)
 
     const pfpA = document.createElement('a')
+    const pfpImg = document.createElement('img')
+    pfpImg.setAttribute('src', (await obtenerPfp(user.email)).imgUrl)
+    pfpA.append(pfpImg)
+    pfpA.setAttribute('href', './user.html')
+    header.append(pfpA)
   }
-
-  const pfpA = document.createElement('a')
 
   document.body.prepend(header)
 }

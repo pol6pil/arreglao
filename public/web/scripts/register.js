@@ -1,7 +1,4 @@
 'use strict'
-
-import * as userLogger from './generic/userLogger.js'
-_
 async function register (formData) {
   const res = await fetch('http://localhost/users/', {
     method: 'POST',
@@ -9,7 +6,8 @@ async function register (formData) {
   })
   if (res.ok) {
     const json = await res.json()
-    userLogger(json.email, json.isAdmin)
+    // eslint-disable-next-line no-undef
+    saveUser(json.email, json.isAdmin)
   } else {
     console.log('todo MAL')
   }

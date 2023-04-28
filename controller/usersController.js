@@ -8,7 +8,6 @@ const bcrypt = require('bcrypt')
 
 // Funcionalidades de la api respecto a usuarios
 module.exports.login = async (req, res) => {
-  console.log(req.body)
   const email = req.body.email || 0
   const password = req.body.password || 0
 
@@ -16,71 +15,47 @@ module.exports.login = async (req, res) => {
     // Si el email no es valido enviamos un error
     res.status(400).send({ error: 'incomplete form' })
   }
-
-  // Generamos salt
-  try {
-    const salt = await bcrypt.genSalt()
-    console.log(password)
-    console.log(salt)
-    const hashedPass = await bcrypt.hash(password, salt)
-    console.log(hashedPass)
-    console.log()
-  } catch (error) {
-    console.log(error)
-    res.status(400).send({ error: 'login failed' })
-  }
   // Conexion a la bbdd
   // Almacenamos la consulta en un string
   const consult = 'SELECT * FROM usuarios WHERE email = ?'
   // Consulta a la bbdd con la consulta almacenada
   const sqlResponse = await con.query(consult, email)
-  // Obtencion del usuario devuelto
-  const userJson = user.toJson(sqlResponse[0][0])
-  // Comprobamos si el usuario existe
-  if (userJson === null) {
 
-  } else if (await bcrypt.compare(password, userJson.password)) {
-    // Comprobamos si la contraseña es valida
-    res.send(userJson)
+  // Comprobamos si el usuario existe
+  // Obtencion del usuario
+  const userJson = user.toJson(sqlResponse[0][0])
+  if (userJson === null) {
+    res.status(400).send({ error: 'user not found' })
   } else {
-    res.status(400).send({ error: 'invalid password' })
+    const userPassword = sqlResponse[0][0].pass
+    if (await bcrypt.compare(password, userPassword)) {
+      // Comprobamos si la contraseña es valida
+      res.send(userJson)
+    } else {
+      res.status(400).send({ error: 'invalid password' })
+    }
   }
 }
 
 module.exports.getPfp = async (req, res) => {
-//   const limit = Number(req.query.limit) || 0
-//   const category = req.params.category || 0
+  const email = req.params.email || 0
 
-//   if (category > 0) {
-//     // Conexion a la bbdd
-//     // Almacenamos la consulta en un string para luego modificarlo
-//     let consult = 'SELECT * FROM piezas WHERE id_categoria = ?'
-//     const queryColumns = []
-//     queryColumns.push(category)
-//     // Si tiene limite la consulta se lo añadimos al string
-//     if (limit > 0) {
-//       consult += ' LIMIT ?'
-//       queryColumns.push(limit)
-//     }
-//     // Consulta a la bbdd con la consulta almacenada
-//     const sqlResponse = await con.query(consult, queryColumns)
-//     // Obtencion de las filas devueltas
-//     const rows = sqlResponse[0]
-//     // Procesamos las filas para poder enviarlas
-//     const rowsJson = []
-//     for (const row of rows) {
-//       // Consula a la bbdd de las opciones de la pieza
-//       const options = await con.query('SELECT * FROM opciones_piezas WHERE id_pieza = ?', [row.id_pieza])
-//       rowsJson.push(part.toJson(row, options[0]))
-//     }
-//     res.send(rowsJson)
-//   } else {
-//     // Si el id no es valido enviamos un error
-//     res.status(400).send({ error: 'invalid id' })
-//   }
+  if (email === 0) {
+    // Si el email no es valido enviamos un error
+    res.status(400).send({ error: 'user not found' })
+  }
+  // Conexion a la bbdd
+  // Almacenamos la consulta en un string
+  const consult = 'SELECT foto FROM usuarios WHERE email = ?'
+  // Consulta a la bbdd con la consulta almacenada
+  const sqlResponse = await con.query(consult, email)
+
+  // Comprobamos si el usuario existe
+  // Obtencion del usuario
+  const imgUrl = user.getImage(sqlResponse[0])
+  res.send(imgUrl)
 }
 module.exports.register = async (req, res) => {
-  console.log(req.body)
   const email = req.body.email || 0
   const name = req.body.name || 0
   const surname1 = req.body.surname1 || 0
