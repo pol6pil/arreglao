@@ -1,6 +1,6 @@
 'use strict'
 
-async function getAllAppliances() {
+async function getAllAppliances () {
   const res = await fetch('http://localhost:80/appliances')
   const json = await res.json()
   const divAppliances = document.querySelector('#appliances')
@@ -10,19 +10,21 @@ async function getAllAppliances() {
   }
 }
 getAllAppliances()
-const isAdmin = true
-function showAppliance(div, appliance) {
+const user = (JSON.parse(window.localStorage.getItem('user')))
+let isAdmin = 0
+if (user !== null) {
+  isAdmin = user.isAdmin
+}
+console.log(isAdmin)
+function showAppliance (div, appliance) {
   const divAppliance = document.createElement('div')
   divAppliance.className = 'appliance'
-
+  const a = document.createElement('a')
   if (!isAdmin) {
-    const a = document.createElement('a')
-    a.setAttribute('href', `./products.html?appliance=${appliance.id}`)
+    a.setAttribute('href', `./parts.html?appliance=${appliance.id}`)
+  } else {
+    a.setAttribute('href', `./insertappliance.html?id=${appliance.id}`)
   }
-  else {
-
-  }
-
 
   const adiv = document.createElement('div')
   const h3 = document.createElement('h3')

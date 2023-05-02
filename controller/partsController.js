@@ -6,31 +6,45 @@ const deleteFile = require('../middleware/deleteFile')
 const path = require('path')
 // Funcionalidades de la api respecto a piezas
 module.exports.getAllParts = async (req, res) => {
-  const limit = Number(req.query.limit) || 0
+  try {
+    const limit = Number(req.query.limit) || 0
+    const orderBy = req.query.orderBy || 0
+    const desc = Number(req.query.orderBy) || 0
 
-  // Conexion a la bbdd
-  // Almacenamos la consulta en un string para luego modificarlo
-  let consult = 'SELECT * FROM piezas'
-  const queryColumns = []
-  // Si tiene limite la consulta se lo añadimos al string
-  if (limit > 0) {
-    consult += ' LIMIT ?'
-    queryColumns.push(limit)
-  }
-  // Consulta a la bbdd con la consulta almacenada
-  const sqlResponse = await con.query(consult, queryColumns)
+    // Conexion a la bbdd
+    // Almacenamos la consulta en un string para luego modificarlo
+    let consult = 'SELECT * FROM piezas'
+    const queryColumns = []
+    // Si tiene orden la consulta se lo añadimos al string, order no admite campos preparados
+    if (orderBy !== 0) {
+      consult += ` ORDER BY ${orderBy}`
+      // Cambiamos el tipo de orden segun se haya especificado
+      if (desc === 1) {
+        consult += ' DESC'
+      }
+    }
+    // Si tiene limite la consulta se lo añadimos al string
+    if (limit > 0) {
+      consult += ' LIMIT ?'
+      queryColumns.push(limit)
+    }
+    // Consulta a la bbdd con la consulta almacenada
+    const sqlResponse = await con.query(consult, queryColumns)
 
-  // Obtencion de las filas devueltas
-  const rows = sqlResponse[0]
+    // Obtencion de las filas devueltas
+    const rows = sqlResponse[0]
 
-  // Procesamos las filas para poder enviarlas
-  const rowsJson = []
-  for (const row of rows) {
+    // Procesamos las filas para poder enviarlas
+    const rowsJson = []
+    for (const row of rows) {
     // Consula a la bbdd de las opciones de la pieza
-    const options = await con.query('SELECT * FROM opciones_piezas WHERE id_pieza = ?', [row.id_pieza])
-    rowsJson.push(part.toJson(row, options[0]))
+      const options = await con.query('SELECT * FROM opciones_piezas WHERE id_pieza = ?', [row.id_pieza])
+      rowsJson.push(part.toJson(row, options[0]))
+    }
+    res.send(rowsJson)
+  } catch (error) {
+    res.status(400).send({ error: 'select failed' })
   }
-  res.send(rowsJson)
 }
 
 module.exports.getAllPartsInAppliance = async (req, res) => {
