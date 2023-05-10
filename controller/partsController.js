@@ -9,7 +9,7 @@ module.exports.getAllParts = async (req, res) => {
   try {
     const limit = Number(req.query.limit) || 0
     const orderBy = req.query.orderBy || 0
-    const desc = Number(req.query.orderBy) || 0
+    const desc = Number(req.query.desc) || 0
 
     // Conexion a la bbdd
     // Almacenamos la consulta en un string para luego modificarlo

@@ -6,24 +6,15 @@ async function obtenerPartes (appliance, orderBy, desc) {
   if (appliance <= 0) {
     fetchQuerry = 'http://localhost/parts'
   }
-  const res = await fetch(fetchQuerry)
-  const json = await res.json()
-
   // Si queremos ordenar las partes se ordenan
   if (orderBy !== undefined) {
-    if (orderBy === 'price') {
-      json.sort((a, b) => a.options[0].price - b.options[0].price)
-    } else if (orderBy === 'name') {
-      console.log(json)
-      json.sort((a, b) => a.name.localeCompare(b.name))
-    }
+    fetchQuerry += `?orderBy=${orderBy}`
   }
-
-  if (desc !== undefined) {
-    json.reverse()
+  if (desc === 1) {
+    fetchQuerry += '&desc=1'
   }
-
-  return json
+  const res = await fetch(fetchQuerry)
+  return await res.json()
 }
 
 async function mostrarPartes (appliance, orderBy, desc) {
@@ -33,6 +24,7 @@ async function mostrarPartes (appliance, orderBy, desc) {
   // Mostramos las partes
   const partsDiv = document.querySelector('#partes')
   for (const part of parts) {
+    // eslint-disable-next-line no-undef
     mostrarParte(part, partsDiv)
   }
 
@@ -70,6 +62,7 @@ function actualizarPartes (categories, parts) {
   if (checkedCategories.length === 0) {
     // Mostramos las partes
     for (const part of parts) {
+      // eslint-disable-next-line no-undef
       mostrarParte(part, partsDiv)
     }
   } else {
@@ -179,25 +172,6 @@ window.onclick = (e) => {
   }
 }
 
-const CryptoJS = require('crypto-js')
-
-const encrypt = (text) => {
-  return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(text))
-}
-
-const decrypt = (data) => {
-  return CryptoJS.enc.Base64.parse(data).toString(CryptoJS.enc.Utf8)
-}
-const pass = encrypt('hola')
-
-console.log(pass)
-
-console.log(decrypt(pass))
-
-console.log(decrypt(pass) === 'hola')
-
-console.log(encrypt('hola') === pass)
-
 // Evento onclick de los elementos del dropdown
 const dropdowns = document.querySelectorAll('#ordenarPorDropdown p')
 for (const dropdown of dropdowns) {
@@ -217,13 +191,13 @@ for (const dropdown of dropdowns) {
     const urlParams = new URLSearchParams(window.location.search)
     const appliance = urlParams.get('appliance') || 0
     if (dropdown.id === 'sort1') {
-      mostrarPartes(appliance, 'name')
+      mostrarPartes(appliance, 'nombre')
     } else if (dropdown.id === 'sort2') {
-      mostrarPartes(appliance, 'name', true)
+      mostrarPartes(appliance, 'nombre', 1)
     } else if (dropdown.id === 'sort3') {
-      mostrarPartes(appliance, 'price')
+      mostrarPartes(appliance, 'precio')
     } else if (dropdown.id === 'sort4') {
-      mostrarPartes(appliance, 'price', true)
+      mostrarPartes(appliance, 'precio', 1)
     }
   }
 }
