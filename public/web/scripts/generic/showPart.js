@@ -1,7 +1,14 @@
+'use strict'
+// eslint-disable-next-line no-unused-vars
 function mostrarParte (part, div) {
   const article = document.createElement('article')
   const a = document.createElement('a')
-  a.setAttribute('href', `./part.html?id=${part.id}`)
+  // eslint-disable-next-line no-undef
+  if (isAdmin()) {
+    a.setAttribute('href', `./insertPart.html?id=${part.id}`)
+  } else {
+    a.setAttribute('href', `./part.html?id=${part.id}`)
+  }
 
   const imgDiv = document.createElement('div')
   imgDiv.className = 'partPreviewImg'

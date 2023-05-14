@@ -44,8 +44,8 @@ router.get('/', part.getAllParts)
 router.get('/category/:category', part.getAllPartsInCategory)
 router.get('/appliance/:appliance', part.getAllPartsInAppliance)
 router.get('/:id', part.getPart)
-router.post('/', part.addPart)
+router.post('/', upload.array('files'), part.addPart)
 router.put('/:id', upload.array('files'), part.editPart)
-// router.delete('/:id', part.deletePart)
+router.delete('/:id', part.deletePart)
 
 module.exports = router

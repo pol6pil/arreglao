@@ -183,7 +183,7 @@ module.exports.editPart = async (req, res) => {
       })
     } else {
       const connection = await con.getConnection()
-      // Hacemos una transaccion para poder insertar tanto como las piezas como las opciones
+      // Hacemos una transaccion para poder editar tanto como las piezas como las opciones
       try {
         await connection.beginTransaction()
         // Editamos la pieza la pieza
@@ -249,6 +249,41 @@ module.exports.editPart = async (req, res) => {
         console.log(error)
         res.status(400).send({ error: 'update failed' })
       }
+    }
+  }
+}
+
+module.exports.deletePart = async (req, res) => {
+  const partId = req.params.id || 0
+  if (partId === 0) {
+    res.json({
+      status: 'error',
+      message: 'data is undefined'
+    })
+  } else {
+    const connection = await con.getConnection()
+    // Hacemos una transaccion para poder borrar tanto como las piezas como las opciones
+    try {
+      await connection.beginTransaction()
+      // Obtenemos las imagenes de las opciones de la pieza
+      const sqlResponse = await con.query('SELECT * FROM opciones_piezas WHERE id_pieza = ?', [partId])
+      const options = sqlResponse[0]
+      console.log(options)
+      // Borramos las imagenes de las opciones
+      for (const option of options) {
+        deleteFile(path.join(process.cwd(), '/public/images/parts/', option.imagen))
+      }
+      await con.query('DELETE FROM opciones_piezas WHERE `id_pieza`=?', [partId])
+      await con.query('DELETE FROM piezas WHERE `id_pieza`=?', [partId])
+
+      // Devolvemos el json del producto añadido si todo esta bien (reutilizamos codigo)
+      res.send({ message: 'delete successful' })
+      await connection.commit()
+      // Si da error la insercion, borramos la imagen y hacemos un rollback a la transaccion
+    } catch (error) {
+      await connection.rollback()
+      console.log(error)
+      res.status(400).send({ error: 'update failed' })
     }
   }
 }

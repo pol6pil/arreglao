@@ -10,17 +10,13 @@ async function getAllAppliances () {
   }
 }
 getAllAppliances()
-const user = (JSON.parse(window.localStorage.getItem('user')))
-let isAdmin = 0
-if (user !== null) {
-  isAdmin = user.isAdmin
-}
-console.log(isAdmin)
+
 function showAppliance (div, appliance) {
   const divAppliance = document.createElement('div')
   divAppliance.className = 'appliance'
   const a = document.createElement('a')
-  if (!isAdmin) {
+  // eslint-disable-next-line no-undef
+  if (!isAdmin()) {
     a.setAttribute('href', `./parts.html?appliance=${appliance.id}`)
   } else {
     a.setAttribute('href', `./insertappliance.html?id=${appliance.id}`)

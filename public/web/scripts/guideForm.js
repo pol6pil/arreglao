@@ -1,43 +1,22 @@
 'use strict'
+
 /* eslint-disable no-eval */
 
-async function showCategories (div) {
-  // Creamos el select
-  const select = document.createElement('select')
-  select.name = 'categoria'
-
+async function showParts (select) {
   // Recibimos las categorias
-  const res = await fetch('http://localhost/categories')
+  const res = await fetch('http://localhost/parts')
   const json = await res.json()
 
-  for (const category of json) {
+  for (const part of json) {
     const option = document.createElement('option')
-    option.value = category.id
-    option.append(category.name)
+    option.value = part.id
+    option.append(part.name)
     select.append(option)
   }
-  div.append(select)
 }
 
-async function showAppliances (div) {
-  // Creamos el select
-  const select = document.createElement('select')
-  select.name = 'electronico'
 
-  // Recibimos las categorias
-  const res = await fetch('http://localhost/appliances')
-  const json = await res.json()
-
-  for (const category of json) {
-    const option = document.createElement('option')
-    option.value = category.id
-    option.append(category.name)
-    select.append(option)
-  }
-  div.append(select)
-}
-
-async function insertPart (formData) {
+async function insertGuide (formData) {
   const res = await fetch('http://localhost/parts', {
     method: 'POST',
     body: formData // Payload is formData object
@@ -48,7 +27,7 @@ async function insertPart (formData) {
     window.location.href = './index.html'
   }
 }
-async function updatePart (id, formData) {
+async function updateGuide (id, formData) {
   const res = await fetch(`http://localhost/parts/${id}`, {
     method: 'PUT',
     body: formData // Payload is formData object
@@ -58,7 +37,7 @@ async function updatePart (id, formData) {
     window.location.href = './index.html'
   }
 }
-async function deletePart (id) {
+async function deleteGuide (id) {
   const res = await fetch(`http://localhost/parts/${id}`, {
     method: 'DELETE'
   })
@@ -69,25 +48,20 @@ async function deletePart (id) {
   }
 }
 
-// Funcion que muestra la parte
-async function showPart (id, form) {
+// Funcion que muestra la guia
+async function showGuide (id, form) {
   // Recibimos la parte de la api
-  const res = await fetch(`http://localhost/parts/${id}`)
+  const res = await fetch(`http://localhost/guide/${id}`)
   const json = await res.json()
 
   // Rellenamos los campos con la parte
-  form.nombre.value = json.name
-  form.descripcion.value = json.description
-  form.garantia.value = json.warranty
-  form.advertencia.value = json.warning
-  form.nota.value = json.note
-  form.garantia.value = json.warranty
-
-  form.electronico.selectedIndex = json.appliance - 1
-  form.categoria.selectedIndex = json.category - 1
+  form.title.value = json.name
+  form.intro.value = json.intro
+  form.time.value = json.time
+  form.difficulty.value = json.difficulty
+  form.part.selectedIndex = json.part - 1
 
   // Mostramos las opciones de la parte
-
   let optionsQuantity = 0
   for (const option of json.options) {
     addOptionForm(optionsQuantity, true, option.id)

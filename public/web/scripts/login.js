@@ -13,9 +13,9 @@ async function login (formData) {
   } else {
     clearErrors()
     if (json.error === 'user not found') {
-      showError('Usuario no encontrado')
+      window.alert('Usuario no encontrado')
     } else if (json.error === 'invalid password') {
-      showError('Contraseña invalida')
+      window.alert('Contraseña invalida')
     }
   }
 }
@@ -25,14 +25,6 @@ function clearErrors () {
   for (const error of errors) {
     error.remove()
   }
-}
-
-function showError (errorMsg) {
-  const form = document.forms.login
-  const errorSpan = document.createElement('span')
-  errorSpan.className = 'error'
-  errorSpan.append(errorMsg)
-  form.append(errorSpan)
 }
 
 const form = document.forms.login

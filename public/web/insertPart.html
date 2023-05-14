@@ -6,6 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="./scripts/generic/isAdmin.js"></script>
+    <script src="./scripts/header.js" defer></script>
     <script src="scripts/insertPart.js" defer></script>
 </head>
 
@@ -13,7 +15,7 @@
     <form action="#" enctype="multipart/form-data" method="post" name="pieza">
         <div>
             <label for="nombre">Nombre:</label>
-            <input required type="text" name="nombre"><br>
+            <input required type="text" name="nombre">
         </div>
         <div>
             <label for="descripcion">Descripcion:</label>
@@ -21,15 +23,15 @@
         </div>
         <div>
             <label for="garantia">Garantia:</label>
-            <input required type="number" name="garantia"><br>
+            <input required type="number" name="garantia">
         </div>
         <div>
             <label for="advertencia">Advertencia:</label>
-            <input type="text" name="advertencia"><br>
+            <input type="text" name="advertencia">
         </div>
         <div>
             <label for="nota">Nota:</label>
-            <input type="text" name="nota"><br>
+            <input type="text" name="nota">
         </div>
         <div id="categories">
             <label for="categoria">Categoria:</label>
@@ -44,7 +46,9 @@
             <span>Añadir Opcion</span>
             <button type="button" id="addOptionButton">+</button>
         </div>
-        <input type="submit" value="Subir">
+        <div>
+            <input type="submit" value="Subir">
+        </div>
     </form>
 </body>
 

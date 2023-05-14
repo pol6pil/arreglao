@@ -9,19 +9,22 @@ async function obtenerPfp (email) {
 
 async function mostrarHeader () {
   const header = document.createElement('header')
+  const divLinks = document.createElement('div')
   const aboutUs = document.createElement('a')
   aboutUs.setAttribute('href', './aboutUs.html')
   aboutUs.append('Sobre nosotros')
-  header.append(aboutUs)
+  divLinks.append(aboutUs)
   const store = document.createElement('a')
   store.setAttribute('href', './index.html')
   store.append('Tienda')
-  header.append(store)
+  divLinks.append(store)
   const guides = document.createElement('a')
   guides.setAttribute('href', './guides.html')
-  header.append(guides)
+  divLinks.append(guides)
   guides.append('Guias')
+  header.append(divLinks)
 
+  const divActions = document.createElement('div')
   const searchForm = document.createElement('form')
   searchForm.name = 'search'
   const searchInput = document.createElement('input')
@@ -34,35 +37,46 @@ async function mostrarHeader () {
   searchButton.append(searchIcon)
   searchForm.append(searchInput)
   searchForm.append(searchButton)
-  header.append(searchForm)
+  divActions.append(searchForm)
 
   // Si el usuario no esta logeado
   if (window.localStorage.getItem('user') === null) {
     const login = document.createElement('a')
     login.setAttribute('href', './login.html')
     login.append('Iniciar Sesion')
-    header.append(login)
+    divActions.append(login)
     const register = document.createElement('a')
     register.setAttribute('href', './register.html')
     register.append('Registrarse')
-    header.append(register)
+    divActions.append(register)
   } else {
-    // Si el usuario esta logeado
+    // Si el usuario esta logeado, comprobamos si es admin
     const user = JSON.parse(window.localStorage.getItem('user'))
+    if (user.isAdmin === 0) {
+      const pfpA = document.createElement('a')
+      const pfpImg = document.createElement('img')
+      pfpImg.setAttribute('src', (await obtenerPfp(user.email)).imgUrl)
+      pfpA.append(pfpImg)
+      pfpA.setAttribute('href', './user.html')
+      divActions.append(pfpA)
+    } else {
+      aboutUs.remove()
+      const insertPart = document.createElement('a')
+      insertPart.setAttribute('href', './insertPart.html')
+      insertPart.append('Crear pieza nueva')
+      divLinks.append(insertPart)
+      const insertAppliance = document.createElement('a')
+      insertAppliance.setAttribute('href', './insertAppliance.html')
+      insertAppliance.append('Crear electrodomestico nuevo')
+      divLinks.append(insertAppliance)
+    }
     const logoff = document.createElement('a')
     logoff.setAttribute('href', './index.html')
     logoff.onclick = () => { window.localStorage.removeItem('user') }
     logoff.append('Cerrar Sesion')
-    header.append(logoff)
-
-    const pfpA = document.createElement('a')
-    const pfpImg = document.createElement('img')
-    pfpImg.setAttribute('src', (await obtenerPfp(user.email)).imgUrl)
-    pfpA.append(pfpImg)
-    pfpA.setAttribute('href', './user.html')
-    header.append(pfpA)
+    divActions.append(logoff)
   }
-
+  header.append(divActions)
   document.body.prepend(header)
 }
 mostrarHeader()

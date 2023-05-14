@@ -5,11 +5,10 @@ async function register (formData) {
     body: formData // Payload is formData object
   })
   if (res.ok) {
+    window.alert('Usuario registrado exitosamente')
     const json = await res.json()
     // eslint-disable-next-line no-undef
     saveUser(json.email, json.isAdmin)
-  } else {
-    console.log('todo MAL')
   }
 }
 
