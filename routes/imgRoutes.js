@@ -12,6 +12,7 @@ const img = require('../controller/imgController')
 router.get('/parts/:img', img.getPart)
 router.get('/appliances/:img', img.getAppliance)
 router.get('/users/:img', img.getUser)
+router.get('/guides/:img', img.getGuide)
 
 // router.post('/', part.addPart)
 // router.put('/:id', part.editPart)

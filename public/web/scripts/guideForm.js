@@ -3,10 +3,11 @@
 /* eslint-disable no-eval */
 
 async function showParts (select) {
-  // Recibimos las categorias
+  // Recibimos las partes
   const res = await fetch('http://localhost/parts')
   const json = await res.json()
 
+  // Las mostramos en el select
   for (const part of json) {
     const option = document.createElement('option')
     option.value = part.id
@@ -14,7 +15,6 @@ async function showParts (select) {
     select.append(option)
   }
 }
-
 
 async function insertGuide (formData) {
   const res = await fetch('http://localhost/parts', {
@@ -51,44 +51,48 @@ async function deleteGuide (id) {
 // Funcion que muestra la guia
 async function showGuide (id, form) {
   // Recibimos la parte de la api
-  const res = await fetch(`http://localhost/guide/${id}`)
+  const res = await fetch(`http://localhost/guides/${id}`)
   const json = await res.json()
+  const imgDiv = document.querySelector('#imgDiv')
+  const img = document.createElement('img')
+  img.setAttribute('src', json.imgUrl)
+  img.alt = json.name
+  imgDiv.prepend(img)
 
   // Rellenamos los campos con la parte
   form.title.value = json.name
   form.intro.value = json.intro
-  form.time.value = json.time
-  form.difficulty.value = json.difficulty
+  form.time.value = json.duration
+  form.difficulty.selectedIndex = json.difficulty
   form.part.selectedIndex = json.part - 1
 
   // Mostramos las opciones de la parte
   let optionsQuantity = 0
-  for (const option of json.options) {
+  for (const option of json.steps) {
     addOptionForm(optionsQuantity, true, option.id)
-    eval('form.nombreOpt' + optionsQuantity + '.value = option.name')
-    eval('form.precioOpt' + optionsQuantity + '.value = option.price')
+    eval('form.nameStep' + optionsQuantity + '.value = option.name')
 
     // Mostramos la imagen
-    const optionImg = document.createElement('img')
-    optionImg.setAttribute('src', option.imgUrl)
+    const stepImg = document.createElement('img')
+    stepImg.setAttribute('src', option.imgUrl)
 
-    const imageDiv = document.querySelector(`#option${optionsQuantity}Image`)
-    imageDiv.append(optionImg)
+    const imageDiv = document.querySelector(`#step${optionsQuantity}Image`)
+    imageDiv.append(stepImg)
     optionsQuantity++
   }
 }
 // Evento del boton para generar un formulario de opcion
-function addOptionForm (i, isUpdate, id) {
+function addStepForm (i, isUpdate, id) {
   // Generamos el div de la opcion
-  const optionsDiv = document.querySelector('#options')
-  const optionDiv = document.createElement('div')
-  optionDiv.className = 'option'
+  const stepsDiv = document.querySelector('#steps')
+  const stepDiv = document.createElement('div')
+  stepDiv.className = 'step'
 
   // Si la opcion existe mostramos la imagen generamos un div en el que poner la imagen
   if (isUpdate) {
     const imageDiv = document.createElement('div')
-    imageDiv.id = `option${i}Image`
-    optionDiv.append(imageDiv)
+    imageDiv.id = `step${i}Image`
+    stepDiv.append(imageDiv)
   }
 
   // Contenemos el formulario del option en un div
@@ -186,23 +190,20 @@ function addOptionForm (i, isUpdate, id) {
 const urlParams = new URLSearchParams(window.location.search)
 const id = urlParams.get('id') || 0
 
-// Si el usuario no es una admin, le redirigimos a otra pagina
+// Si el usuario es un admin o anonimo, le redirigimos a otra pagina
 // eslint-disable-next-line no-undef
-if (!isAdmin()) {
+if (!isLogged()) {
   window.location.href = './error.html'
 }
 
-const form = document.forms.pieza
-const categories = form.querySelector('#categories')
-const appliances = form.querySelector('#appliances')
-showCategories(categories)
-showAppliances(appliances)
+const form = document.forms.guia
+showParts(form.part)
 const addOptionButton = document.querySelector('#addOptionButton')
 let optionsQuantity = 0
 
-// Si tiene una id, se muestran los datos de la parte
+// Si tiene una id, se muestran los datos de la guia
 if (id > 0) {
-  showPart(id, form)
+  showGuide(id, form)
   // Mostramos el boton para borrar la pieza
   const delButton = document.createElement('button')
   delButton.className = 'deleteBtn'
@@ -210,7 +211,7 @@ if (id > 0) {
   delButton.innerText = 'Borrar pieza'
   delButton.onclick = () => {
     if (window.confirm('¿Está seguro de que quiere borrar la pieza de manera permanente?') === true) {
-      deletePart(id)
+      // deletePart(id)
       window.location.href = './index.html'
     }
   }
@@ -275,11 +276,11 @@ form.onsubmit = (e) => {
   console.log(optionsJson)
   formData.append('options', optionsJson)
   if (optionsCount > 0) {
-    if (id > 0) {
-      updatePart(id, formData)
-    } else {
-      insertPart(formData)
-    }
+    // if (id > 0) {
+    //   updatePart(id, formData)
+    // } else {
+    //   insertPart(formData)
+    // }
   } else {
     window.alert('La pieza necesita como mínimo 1 opción')
   }

@@ -18,7 +18,7 @@ const appliancesRoute = require('./routes/appliancesRoutes')
 const categoriesRoute = require('./routes/categoriesRoutes')
 const imgRoute = require('./routes/imgRoutes')
 const usersRoute = require('./routes/usersRoutes')
-const guidesRoute = require('./routes/guidesRoute')
+const guidesRoute = require('./routes/guidesRoutes')
 
 // middleware
 app.use(express.static(path.join(__dirname, '/public')))
