@@ -9,11 +9,18 @@ async function showParts (select) {
 
   // Las mostramos en el select
   for (const part of json) {
-    const step = document.createElement('step')
-    step.value = part.id
-    step.append(part.name)
-    select.append(step)
+    const option = document.createElement('option')
+    option.value = part.id
+    option.append(part.name)
+    select.append(option)
   }
+}
+
+function howManySteps () {
+  return document.querySelectorAll('.step:not([style*="display: none"])').length
+}
+function howManyInstructionsInStep (step) {
+  return document.querySelectorAll(`.step${step}Instruction:not([style*="display: none"])`).length
 }
 
 async function insertGuide (formData) {
@@ -83,13 +90,13 @@ async function showGuide (id, form) {
   }
 }
 // Evento del boton para generar un formulario de instruccion
-function addInstructionForm (div, stepNum, isUpdate, id) {
+function addInstructionForm (div, i, stepNum, isUpdate, id) {
   // Generamos el div de la instruccion
   const instructionDiv = document.createElement('div')
-
+  instructionDiv.className = `step${stepNum}Instruction`
   // Generamos el select con los tipos de instruccion
   const instructionType = document.createElement('select')
-  instructionType.name = `step${stepNum}instructiontype`
+  instructionType.name = `step${stepNum}Instruction${i}Type`
   const normalType = document.createElement('option')
   normalType.value = 'normal'
   normalType.append('Normal')
@@ -107,10 +114,10 @@ function addInstructionForm (div, stepNum, isUpdate, id) {
   const instructionText = document.createElement('input')
   instructionText.type = 'text'
   instructionText.required = true
-  instructionText.name = `instruction${i}Text`
+  instructionText.name = `step${stepNum}Instruction${i}Text`
   instructionDiv.append(instructionText)
 
-  div.append()
+  div.append(instructionDiv)
 }
 // Evento del boton para generar un formulario de paso
 function addStepForm (i, isUpdate, id) {
@@ -174,15 +181,20 @@ function addStepForm (i, isUpdate, id) {
   // Creamos la lista para las instrucciones
   const instructionsDiv = document.createElement('div')
   instructionsDiv.id = `instrucctionsStep${i}`
+  const instructionsHeader = document.createElement('span')
+  instructionsHeader.append('Instrucciones:')
+  instructionsDiv.append(instructionsHeader)
   stepForm.append(instructionsDiv)
 
   // Boton para crear instrucciones en el paso
   const addInstructionButton = document.createElement('button')
   addInstructionButton.type = 'button'
+  addInstructionButton.append('+')
   addInstructionButton.onclick = () => {
-    addInstructionForm(instructionsDiv, i, )
+    console.log(instructionsDiv, howManyInstructionsInStep(i), i)
+    addInstructionForm(instructionsDiv, howManyInstructionsInStep(i), i)
   }
-
+  stepForm.append(addInstructionButton)
   // Creacion del boton para eliminar la opcion
   const eraseButton = document.createElement('button')
   eraseButton.type = 'button'
@@ -274,7 +286,6 @@ form.onsubmit = (e) => {
   formData.append('appliance', form.electronico.value)
   const stepsArr = []
   let i = 0
-  let stepsCount = 0
   for (const step of steps) {
     const file = eval('form.imagenOpt' + i)
     // Si la opcion se tiene que actualizar porque ya existia lo marcamos
@@ -284,8 +295,6 @@ form.onsubmit = (e) => {
 
     if (isDelete) {
       update = false
-    } else {
-      stepsCount++
     }
     // Si la opcion tiene que actualizar la imagen
     const imageUpload = file.files[0] !== undefined
@@ -307,7 +316,7 @@ form.onsubmit = (e) => {
   const stepsJson = JSON.stringify(stepsArr)
   console.log(stepsJson)
   formData.append('steps', stepsJson)
-  if (stepsCount > 0) {
+  if (howManySteps() > 0) {
     // if (id > 0) {
     //   updatePart(id, formData)
     // } else {
