@@ -9,10 +9,10 @@ async function showParts (select) {
 
   // Las mostramos en el select
   for (const part of json) {
-    const option = document.createElement('option')
-    option.value = part.id
-    option.append(part.name)
-    select.append(option)
+    const step = document.createElement('step')
+    step.value = part.id
+    step.append(part.name)
+    select.append(step)
   }
 }
 
@@ -67,124 +67,155 @@ async function showGuide (id, form) {
   form.part.selectedIndex = json.part - 1
 
   // Mostramos las opciones de la parte
-  let optionsQuantity = 0
-  for (const option of json.steps) {
-    addOptionForm(optionsQuantity, true, option.id)
-    eval('form.nameStep' + optionsQuantity + '.value = option.name')
+  let stepsQuantity = 0
+  for (const step of json.steps) {
+    console.log(step)
+    addStepForm(stepsQuantity, true, step.id)
+    eval('form.nameStep' + stepsQuantity + '.value = step.name')
 
     // Mostramos la imagen
     const stepImg = document.createElement('img')
-    stepImg.setAttribute('src', option.imgUrl)
+    stepImg.setAttribute('src', step.imgUrl)
 
-    const imageDiv = document.querySelector(`#step${optionsQuantity}Image`)
+    const imageDiv = document.querySelector(`#step${stepsQuantity}Image`)
     imageDiv.append(stepImg)
-    optionsQuantity++
+    stepsQuantity++
   }
 }
-// Evento del boton para generar un formulario de opcion
+// Evento del boton para generar un formulario de instruccion
+function addInstructionForm (div, stepNum, isUpdate, id) {
+  // Generamos el div de la instruccion
+  const instructionDiv = document.createElement('div')
+
+  // Generamos el select con los tipos de instruccion
+  const instructionType = document.createElement('select')
+  instructionType.name = `step${stepNum}instructiontype`
+  const normalType = document.createElement('option')
+  normalType.value = 'normal'
+  normalType.append('Normal')
+  instructionType.append(normalType)
+  const adviceType = document.createElement('option')
+  adviceType.value = 'advice'
+  adviceType.append('Consejo')
+  instructionType.append(adviceType)
+  const warningType = document.createElement('option')
+  warningType.value = 'warning'
+  warningType.append('Advertencia')
+  instructionType.append(warningType)
+  instructionDiv.append(instructionType)
+
+  const instructionText = document.createElement('input')
+  instructionText.type = 'text'
+  instructionText.required = true
+  instructionText.name = `instruction${i}Text`
+  instructionDiv.append(instructionText)
+
+  div.append()
+}
+// Evento del boton para generar un formulario de paso
 function addStepForm (i, isUpdate, id) {
-  // Generamos el div de la opcion
+  // Generamos el div del paso
   const stepsDiv = document.querySelector('#steps')
   const stepDiv = document.createElement('div')
+  const stepHeader = document.createElement('div')
+  const stepContent = document.createElement('div')
   stepDiv.className = 'step'
 
   // Si la opcion existe mostramos la imagen generamos un div en el que poner la imagen
   if (isUpdate) {
     const imageDiv = document.createElement('div')
     imageDiv.id = `step${i}Image`
-    stepDiv.append(imageDiv)
+    stepContent.append(imageDiv)
   }
 
-  // Contenemos el formulario del option en un div
-  const optionForm = document.createElement('div')
+  // Contenemos el formulario del step en un div
+  const stepForm = document.createElement('div')
 
   // Generamos los campos de la opcion
   // Nombre
-  const nombreDiv = document.createElement('div')
+  const stepCounter = document.createElement('span')
+  stepCounter.innerText = `Paso ${i + 1}`
+  stepHeader.append(stepCounter)
 
-  const nombreLabel = document.createElement('label')
-  nombreLabel.for = `nombreOpt${i}`
-  nombreLabel.append('Nombre:')
-  nombreDiv.append(nombreLabel)
+  const nameDiv = document.createElement('div')
 
-  const nombreInput = document.createElement('input')
-  nombreInput.name = `nombreOpt${i}`
-  nombreInput.type = 'text'
-  nombreInput.required = true
-  nombreDiv.append(nombreInput)
+  const nameLabel = document.createElement('label')
+  nameLabel.for = `nameStep${i}`
+  nameLabel.append('Nombre:')
+  nameDiv.append(nameLabel)
 
-  optionForm.append(nombreDiv)
+  const nameInput = document.createElement('input')
+  nameInput.name = `nameStep${i}`
+  nameInput.type = 'text'
+  nameInput.required = true
+  nameDiv.append(nameInput)
+
+  stepForm.append(nameDiv)
 
   // Imagen
-  const imagenDiv = document.createElement('div')
+  const imageDiv = document.createElement('div')
 
-  const imagenLabel = document.createElement('label')
-  imagenLabel.for = `imagenOpt${i}`
-  imagenLabel.append('Imagen:')
-  imagenDiv.append(imagenLabel)
+  const imageLabel = document.createElement('label')
+  imageLabel.for = `imagenOpt${i}`
+  imageLabel.append('Imagen:')
+  imageDiv.append(imageLabel)
 
-  const imagenInput = document.createElement('input')
-  imagenInput.name = `imagenOpt${i}`
-  imagenInput.type = 'file'
-  imagenInput.accept = 'image/*'
-  imagenDiv.append(imagenInput)
+  const imageInput = document.createElement('input')
+  imageInput.name = `imagenOpt${i}`
+  imageInput.type = 'file'
+  imageInput.accept = 'image/*'
+  imageDiv.append(imageInput)
 
   // Si la imagen no se actualiza es obligatoria
   if (!isUpdate) {
-    imagenInput.required = true
+    imageInput.required = true
   }
+  stepForm.append(imageDiv)
+  // Creamos la lista para las instrucciones
+  const instructionsDiv = document.createElement('div')
+  instructionsDiv.id = `instrucctionsStep${i}`
+  stepForm.append(instructionsDiv)
 
-  optionForm.append(imagenDiv)
-
-  // Precio
-  const precioDiv = document.createElement('div')
-
-  const precioLabel = document.createElement('label')
-  precioLabel.for = `precioOpt${i}`
-  precioLabel.append('Precio:')
-  precioDiv.append(precioLabel)
-
-  const precioInput = document.createElement('input')
-  precioInput.name = `precioOpt${i}`
-  precioInput.type = 'number'
-  precioInput.step = '.01'
-  precioInput.required = true
-  precioDiv.append(precioInput)
-
-  optionForm.append(precioDiv)
-  optionDiv.append(optionForm)
+  // Boton para crear instrucciones en el paso
+  const addInstructionButton = document.createElement('button')
+  addInstructionButton.type = 'button'
+  addInstructionButton.onclick = () => {
+    addInstructionForm(instructionsDiv, i, )
+  }
 
   // Creacion del boton para eliminar la opcion
   const eraseButton = document.createElement('button')
   eraseButton.type = 'button'
   eraseButton.append('X')
   eraseButton.className = 'eraseButton'
-  optionDiv.append(eraseButton)
+  stepHeader.append(eraseButton)
 
   if (isUpdate) {
-    optionDiv.className = 'optionUpdate'
+    stepDiv.className += ' stepUpdate'
   }
   // Si la opcion ya es existente le asignamos un id
-  if (id) {
-    optionDiv.id = id
+  if (id > 0) {
+    stepDiv.id = id
   }
 
   // Evento para borrar la opcion
   eraseButton.onclick = (e) => {
-    // Si el contenedor es de clase optionUpdate no lo borraremos de la interfaz si no que se ocultara para luego
+    // Si el contenedor es de clase stepUpdate no lo borraremos de la interfaz si no que se ocultara para luego
     // Poder acceder a sus datos para realizar la consulta de delete
-    let div = e.target.closest('.optionUpdate')
+    let div = e.target.closest('.stepUpdate')
     if (div !== null) {
       div.style.display = 'none'
     }
-    // Si el contenedor es de clase option lo eliminaremos de la interfaz
-    div = e.target.closest('.option')
+    // Si el contenedor es de clase step lo eliminaremos de la interfaz
+    div = e.target.closest('.step')
     if (div !== null) {
       div.remove()
     }
   }
-
-  optionsDiv.append(optionDiv)
+  stepContent.append(stepForm)
+  stepDiv.append(stepHeader)
+  stepDiv.append(stepContent)
+  stepsDiv.append(stepDiv)
 }
 // Obtenemos el id de la pieza
 const urlParams = new URLSearchParams(window.location.search)
@@ -198,8 +229,8 @@ if (!isLogged()) {
 
 const form = document.forms.guia
 showParts(form.part)
-const addOptionButton = document.querySelector('#addOptionButton')
-let optionsQuantity = 0
+const addStepButton = document.querySelector('#addStepButton')
+let stepsQuantity = 0
 
 // Si tiene una id, se muestran los datos de la guia
 if (id > 0) {
@@ -215,21 +246,22 @@ if (id > 0) {
       window.location.href = './index.html'
     }
   }
-  const delDiv = document.querySelector('form div:last-child')
+  const delDiv = document.querySelector('#commands')
   delDiv.append(delButton)
 }
 
 // Creacion de los select de categorias
-addOptionButton.onclick = function (e) {
-  addOptionForm(optionsQuantity)
-  optionsQuantity++
+addStepButton.onclick = function (e) {
+  addStepForm(stepsQuantity)
+  stepsQuantity++
+  console.log(document.querySelectorAll('.step'))
 }
 
 // Evento submit del formulario
 form.onsubmit = (e) => {
   e.preventDefault()
   // Prevents HTML handling submission
-  const options = document.querySelectorAll('.optionUpdate, .option')
+  const steps = document.querySelectorAll('.stepUpdate, .step')
   // Creamos un formData al que pasarle todos los datos del formulario
   const formData = new FormData()
 
@@ -240,20 +272,20 @@ form.onsubmit = (e) => {
   formData.append('note', form.nota.value)
   formData.append('category', form.categoria.value)
   formData.append('appliance', form.electronico.value)
-  const optionsArr = []
+  const stepsArr = []
   let i = 0
-  let optionsCount = 0
-  for (const option of options) {
+  let stepsCount = 0
+  for (const step of steps) {
     const file = eval('form.imagenOpt' + i)
     // Si la opcion se tiene que actualizar porque ya existia lo marcamos
-    let update = option.className === 'optionUpdate'
+    let update = step.className === 'stepUpdate'
     // Si la opcion ha sido borrada de la interfaz
-    const isDelete = option.style.display === 'none'
+    const isDelete = step.style.display === 'none'
 
     if (isDelete) {
       update = false
     } else {
-      optionsCount++
+      stepsCount++
     }
     // Si la opcion tiene que actualizar la imagen
     const imageUpload = file.files[0] !== undefined
@@ -261,8 +293,8 @@ form.onsubmit = (e) => {
       formData.append('files', file.files[0])
     }
     // Appends value of text input
-    optionsArr.push({
-      id: option.id,
+    stepsArr.push({
+      id: step.id,
       name: eval('form.nombreOpt' + i + '.value'),
       price: eval('form.precioOpt' + i + '.value'),
       update,
@@ -272,10 +304,10 @@ form.onsubmit = (e) => {
 
     i++
   }
-  const optionsJson = JSON.stringify(optionsArr)
-  console.log(optionsJson)
-  formData.append('options', optionsJson)
-  if (optionsCount > 0) {
+  const stepsJson = JSON.stringify(stepsArr)
+  console.log(stepsJson)
+  formData.append('steps', stepsJson)
+  if (stepsCount > 0) {
     // if (id > 0) {
     //   updatePart(id, formData)
     // } else {

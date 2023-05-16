@@ -184,7 +184,7 @@ function addOptionForm (i, isUpdate, id) {
   optionDiv.append(eraseButton)
 
   if (isUpdate) {
-    optionDiv.className = 'optionUpdate'
+    optionDiv.className += ' optionUpdate'
   }
   // Si la opcion ya es existente le asignamos un id
   if (id) {
