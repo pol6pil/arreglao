@@ -8,7 +8,7 @@ module.exports.toJson = (rawGuide, rawSteps, rawInstructions) => {
     instructions.push(
       {
         id: instruction.id_instruccion,
-        instruction: instruction.instruction,
+        instruction: instruction.instruccion,
         type: instruction.tipo,
         step: instruction.id_paso
       }

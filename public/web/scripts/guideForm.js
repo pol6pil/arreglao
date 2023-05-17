@@ -57,6 +57,7 @@ async function deleteGuide (id) {
 
 // Funcion que muestra la guia
 async function showGuide (id, form) {
+  console.log(form)
   // Recibimos la parte de la api
   const res = await fetch(`http://localhost/guides/${id}`)
   const json = await res.json()
@@ -72,21 +73,24 @@ async function showGuide (id, form) {
   form.time.value = json.duration
   form.difficulty.selectedIndex = json.difficulty
   form.part.selectedIndex = json.part - 1
-
   // Mostramos las opciones de la parte
-  let stepsQuantity = 0
   for (const step of json.steps) {
-    console.log(step)
-    addStepForm(stepsQuantity, true, step.id)
-    eval('form.nameStep' + stepsQuantity + '.value = step.name')
+    addStepForm(howManySteps(), true, step.id)
+    eval(`form.nameStep${howManySteps() - 1}.value = step.name`)
 
     // Mostramos la imagen
     const stepImg = document.createElement('img')
     stepImg.setAttribute('src', step.imgUrl)
 
-    const imageDiv = document.querySelector(`#step${stepsQuantity}Image`)
+    const imageDiv = document.querySelector(`#step${howManySteps() - 1}Image`)
     imageDiv.append(stepImg)
-    stepsQuantity++
+    for (const instruction of step.instructions) {
+      console.log(instruction)
+      const instructionsDiv = document.querySelector(`#instructionsStep${howManySteps() - 1}`)
+      addInstructionForm(instructionsDiv, howManyInstructionsInStep(howManySteps() - 1), howManySteps() - 1, true, instruction.id)
+      eval(`form.step${howManySteps() - 1}Instruction${howManyInstructionsInStep(howManySteps() - 1) - 1}Text.value = instruction.instruction`)
+      eval(`form.step${howManySteps() - 1}Instruction${howManyInstructionsInStep(howManySteps() - 1) - 1}Type.selectedIndex = instruction.type`)
+    }
   }
 }
 // Evento del boton para generar un formulario de instruccion
@@ -94,28 +98,48 @@ function addInstructionForm (div, i, stepNum, isUpdate, id) {
   // Generamos el div de la instruccion
   const instructionDiv = document.createElement('div')
   instructionDiv.className = `step${stepNum}Instruction`
+  const instructionContentDiv = document.createElement('div')
   // Generamos el select con los tipos de instruccion
+  const typeDiv = document.createElement('div')
+  const typeSpan = document.createElement('span')
+  typeSpan.append('Tipo:')
+  typeDiv.append(typeSpan)
   const instructionType = document.createElement('select')
   instructionType.name = `step${stepNum}Instruction${i}Type`
   const normalType = document.createElement('option')
-  normalType.value = 'normal'
+  normalType.value = 0
   normalType.append('Normal')
   instructionType.append(normalType)
   const adviceType = document.createElement('option')
-  adviceType.value = 'advice'
+  adviceType.value = 1
   adviceType.append('Consejo')
   instructionType.append(adviceType)
   const warningType = document.createElement('option')
-  warningType.value = 'warning'
+  warningType.value = 2
   warningType.append('Advertencia')
   instructionType.append(warningType)
-  instructionDiv.append(instructionType)
+  typeDiv.append(instructionType)
+  instructionContentDiv.append(typeDiv)
 
+  const textDiv = document.createElement('div')
+  const textSpan = document.createElement('span')
+  textSpan.append('Instrucción')
+  textDiv.append(textSpan)
   const instructionText = document.createElement('input')
   instructionText.type = 'text'
   instructionText.required = true
   instructionText.name = `step${stepNum}Instruction${i}Text`
-  instructionDiv.append(instructionText)
+  textDiv.append(instructionText)
+  instructionContentDiv.append(textDiv)
+  instructionDiv.append(instructionContentDiv)
+
+  if (isUpdate) {
+    instructionDiv.className += ' instructionUpdate'
+  }
+  // Si la guia ya es existente le asignamos un id
+  if (id > 0) {
+    instructionDiv.id = id
+  }
 
   div.append(instructionDiv)
 }
@@ -128,7 +152,7 @@ function addStepForm (i, isUpdate, id) {
   const stepContent = document.createElement('div')
   stepDiv.className = 'step'
 
-  // Si la opcion existe mostramos la imagen generamos un div en el que poner la imagen
+  // Si la guia existe mostramos la imagen generamos un div en el que poner la imagen
   if (isUpdate) {
     const imageDiv = document.createElement('div')
     imageDiv.id = `step${i}Image`
@@ -180,7 +204,7 @@ function addStepForm (i, isUpdate, id) {
   stepForm.append(imageDiv)
   // Creamos la lista para las instrucciones
   const instructionsDiv = document.createElement('div')
-  instructionsDiv.id = `instrucctionsStep${i}`
+  instructionsDiv.id = `instructionsStep${i}`
   const instructionsHeader = document.createElement('span')
   instructionsHeader.append('Instrucciones:')
   instructionsDiv.append(instructionsHeader)
@@ -205,7 +229,7 @@ function addStepForm (i, isUpdate, id) {
   if (isUpdate) {
     stepDiv.className += ' stepUpdate'
   }
-  // Si la opcion ya es existente le asignamos un id
+  // Si la guia ya es existente le asignamos un id
   if (id > 0) {
     stepDiv.id = id
   }
@@ -277,13 +301,15 @@ form.onsubmit = (e) => {
   // Creamos un formData al que pasarle todos los datos del formulario
   const formData = new FormData()
 
-  formData.append('name', form.nombre.value)
-  formData.append('description', form.descripcion.value)
-  formData.append('warranty', form.garantia.value)
-  formData.append('warning', form.advertencia.value)
-  formData.append('note', form.nota.value)
-  formData.append('category', form.categoria.value)
-  formData.append('appliance', form.electronico.value)
+  formData.append('title', form.title.value)
+  formData.append('intro', form.intro.value)
+  formData.append('time', form.time.value)
+  formData.append('difficulty', form.difficulty.value)
+  formData.append('part', form.part.value)
+  // Si la guia tiene que actualizar la imagen
+  if (form.imagen.files[0] !== undefined) {
+    formData.append('files', form.imagen.files[0])
+  }
   const stepsArr = []
   let i = 0
   for (const step of steps) {
