@@ -39,12 +39,13 @@ function checkFileType (file, cb) {
 }
 
 // Rutas de pieza
-router.get('/accepted', guide.getAcceptedGuides)
-// router.get('/pending', part.getPendingGuides)
+router.get('/accepted/:id', guide.getAcceptedGuidesByAppliance)
+router.get('/pending/:id', guide.getPendingGuides)
 router.get('/:id', guide.getGuide)
 // router.get('/part/:id', part.getGuideByPart)
 router.post('/', upload.array('files'), guide.addGuide)
 router.put('/:id', upload.array('files'), guide.editGuide)
+router.put('/:id', guide.acceptGuide)
 router.delete('/:id', guide.deleteGuide)
 
 module.exports = router

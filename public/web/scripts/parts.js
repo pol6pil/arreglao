@@ -71,6 +71,7 @@ function actualizarPartes (categories, parts) {
       const filteredParts = parts.filter(part => part.category === checkedCategorie)
       console.log(filteredParts)
       for (const part of filteredParts) {
+        // eslint-disable-next-line no-undef
         mostrarParte(part, partsDiv)
       }
     }

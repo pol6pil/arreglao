@@ -5,28 +5,64 @@ const con = require('../middleware/sqlconnection')
 const deleteFile = require('../middleware/deleteFile')
 const path = require('path')
 // Funcionalidades de la api respecto a guias
-module.exports.getAcceptedGuides = async (req, res) => {
+module.exports.getAcceptedGuidesByAppliance = async (req, res) => {
   try {
-    // Consulta a la bbdd con la consulta almacenada
-    const guidesSql = await con.query('SELECT * FROM guias WHERE aceptada = 1')
-    // Procesamos las filas para poder enviarlas
-    const guides = guidesSql[0]
-    let steps
-    let instrucctions
-    const guidesJson = []
-    for (const guide of guides) {
-      console.log(guide)
-      // Consula a la bbdd de los pasos de la guia
-      const stepsSql = await con.query('SELECT * FROM pasos WHERE id_guia = ?', [guide.id_guia])
-      steps = stepsSql[0]
-      for (const step of steps) {
+    const id = Number(req.params.id) || 0
+
+    // Si el id se ha marcado hacemos la consulta
+    if (id > 0) {
+      // Consulta a la bbdd con la consulta almacenada
+      const guidesSql = await con.query('SELECT * FROM guias WHERE aceptada = 1 AND id_electrodomestico = ?', [id])
+      // Procesamos las filas para poder enviarlas
+      const guides = guidesSql[0]
+      let steps
+      let instrucctions
+      const guidesJson = []
+      for (const guide of guides) {
+        console.log(guide)
+        // Consula a la bbdd de los pasos de la guia
+        const stepsSql = await con.query('SELECT * FROM pasos WHERE id_guia = ?', [guide.id_guia])
+        steps = stepsSql[0]
+        for (const step of steps) {
         // Consula a la bbdd de las instrucciones del paso
-        const instrucctionsSql = await con.query('SELECT * FROM instrucciones WHERE id_paso = ?', [step.id_paso])
-        instrucctions = instrucctionsSql[0]
+          const instrucctionsSql = await con.query('SELECT * FROM instrucciones WHERE id_paso = ?', [step.id_paso])
+          instrucctions = instrucctionsSql[0]
+        }
+        guidesJson.push(guideModel.toJson(guide, steps, instrucctions))
       }
-      guidesJson.push(guideModel.toJson(guide, steps, instrucctions))
+      res.send(guidesJson)
     }
-    res.send(guidesJson)
+  } catch (error) {
+    res.status(400).send({ error: 'select failed' })
+  }
+}
+
+module.exports.getPendingGuides = async (req, res) => {
+  try {
+    const id = Number(req.params.id) || 0
+
+    // Si el id se ha marcado hacemos la consulta
+    if (id > 0) {
+      // Consulta a la bbdd con la consulta almacenada
+      const guidesSql = await con.query('SELECT * FROM guias WHERE aceptada = 0 AND id_electrodomestico = ?', [id])
+      // Procesamos las filas para poder enviarlas
+      const guides = guidesSql[0]
+      let steps
+      let instrucctions
+      const guidesJson = []
+      for (const guide of guides) {
+        // Consula a la bbdd de los pasos de la guia
+        const stepsSql = await con.query('SELECT * FROM pasos WHERE id_guia = ?', [guide.id_guia])
+        steps = stepsSql[0]
+        for (const step of steps) {
+        // Consula a la bbdd de las instrucciones del paso
+          const instrucctionsSql = await con.query('SELECT * FROM instrucciones WHERE id_paso = ?', [step.id_paso])
+          instrucctions = instrucctionsSql[0]
+        }
+        guidesJson.push(guideModel.toJson(guide, steps, instrucctions))
+      }
+      res.send(guidesJson)
+    }
   } catch (error) {
     res.status(400).send({ error: 'select failed' })
   }
@@ -166,6 +202,21 @@ module.exports.addGuide = async (req, res) => {
   }
 }
 
+module.exports.acceptGuide = async (req, res) => {
+  try {
+    const id = Number(req.params.id) || 0
+    // Si el id se ha marcado hacemos la consulta
+    if (id > 0) {
+      // Consulta a la bbdd con la consulta almacenada
+      const query = 'UPDATE `guias` SET `aceptada`=1 WHERE `id_guia`=?'
+      await con.query(query, [id])
+      res.send({ message: 'guide accepted successfully' })
+    }
+  } catch (error) {
+    res.status(400).send({ error: 'select failed' })
+  }
+}
+
 module.exports.editGuide = async (req, res) => {
   const guideId = req.params.id || 0
   if (guideId > 0) {
@@ -189,16 +240,16 @@ module.exports.editGuide = async (req, res) => {
           // Obtenemos la imagen antigua antes de modificar las opciones para luego poder borrar la imagen
           const imgUrl = await getGuideImage(guideId)
           // Actualizamos la opcion en la bbdd
-          const query = 'UPDATE `guias` SET `imagen`=?, `nombre`=?,`introduccion`=?,`id_pieza`=?,`id_electrodomestico`=?,`email`=?,`duracion`=?,`dificultad`=? WHERE `id_guia`=?'
+          const query = 'UPDATE `guias` SET `imagen`=?, `nombre`=?,`introduccion`=?,`id_pieza`=?,`id_electrodomestico`=?,`email`=?,`duracion`=?,`dificultad`=?,`aceptada`=? WHERE `id_guia`=?'
           await con.query(query,
-            [req.files[fileIndex].filename, req.body.title, req.body.intro, req.body.part, applianceId, req.body.email, req.body.time, req.body.difficulty, guideId])
+            [req.files[fileIndex].filename, req.body.title, req.body.intro, req.body.part, applianceId, req.body.email, req.body.time, req.body.difficulty, 0, guideId])
           fileIndex++
           // Borramos la imagen anterior
           deleteFile(path.join(process.cwd(), '/public/images/guides/', imgUrl))
         } else {
-          const query = 'UPDATE `guias` SET `nombre`=?,`introduccion`=?,`id_pieza`=?,`id_electrodomestico`=?,`email`=?,`duracion`=?,`dificultad`=? WHERE `id_guia`=?'
+          const query = 'UPDATE `guias` SET `nombre`=?,`introduccion`=?,`id_pieza`=?,`id_electrodomestico`=?,`email`=?,`duracion`=?,`dificultad`=?,`aceptada`=? WHERE `id_guia`=?'
           await con.query(query,
-            [req.body.title, req.body.intro, req.body.part, applianceId, req.body.email, req.body.time, req.body.difficulty, guideId])
+            [req.body.title, req.body.intro, req.body.part, applianceId, req.body.email, req.body.time, req.body.difficulty, 0, guideId])
         }
         const steps = JSON.parse(req.body.steps)
 

@@ -19,7 +19,7 @@ async function mostrarHeader () {
   store.append('Tienda')
   divLinks.append(store)
   const guides = document.createElement('a')
-  guides.setAttribute('href', './guides.html')
+  guides.setAttribute('href', './appliancesGuide.html')
   divLinks.append(guides)
   guides.append('Guias')
   header.append(divLinks)
