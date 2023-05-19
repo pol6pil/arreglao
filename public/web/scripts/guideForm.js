@@ -24,7 +24,8 @@ function howManyInstructionsInStep (step) {
 }
 
 async function insertGuide (formData) {
-  const res = await fetch('http://localhost/parts', {
+  console.log('a')
+  const res = await fetch('http://localhost/guides', {
     method: 'POST',
     body: formData // Payload is formData object
   })
@@ -35,7 +36,7 @@ async function insertGuide (formData) {
   }
 }
 async function updateGuide (id, formData) {
-  const res = await fetch(`http://localhost/parts/${id}`, {
+  const res = await fetch(`http://localhost/guides/${id}`, {
     method: 'PUT',
     body: formData // Payload is formData object
   })
@@ -45,7 +46,7 @@ async function updateGuide (id, formData) {
   }
 }
 async function deleteGuide (id) {
-  const res = await fetch(`http://localhost/parts/${id}`, {
+  const res = await fetch(`http://localhost/guides/${id}`, {
     method: 'DELETE'
   })
   const json = await res.json()
@@ -57,12 +58,12 @@ async function deleteGuide (id) {
 
 // Funcion que muestra la guia
 async function showGuide (id, form) {
-  console.log(form)
   // Recibimos la parte de la api
   const res = await fetch(`http://localhost/guides/${id}`)
   const json = await res.json()
   const imgDiv = document.querySelector('#imgDiv')
   const img = document.createElement('img')
+  console.log(json)
   img.setAttribute('src', json.imgUrl)
   img.alt = json.name
   imgDiv.prepend(img)
@@ -72,8 +73,16 @@ async function showGuide (id, form) {
   form.intro.value = json.intro
   form.time.value = json.duration
   form.difficulty.selectedIndex = json.difficulty
-  form.part.selectedIndex = json.part - 1
-  // Mostramos las opciones de la parte
+  console.log(form.part)
+
+  // Recorremos las opciones del select de las piezas para mostrar la opcion correcta
+  const options = form.part.querySelectorAll('option')
+  console.log(options)
+  for (const option of options) {
+    console.log(option.value === json.part.toString(), option.value, json.part.toString())
+    option.selected = option.value === json.part.toString()
+  }
+  // Mostramos los pasos de la guia
   for (const step of json.steps) {
     addStepForm(howManySteps(), true, step.id)
     eval(`form.nameStep${howManySteps() - 1}.value = step.name`)
@@ -161,8 +170,11 @@ function addStepForm (i, isUpdate, id) {
 
   // Contenemos el formulario del step en un div
   const stepForm = document.createElement('div')
+  if (id > 0) {
+    stepForm.id = id
+  }
 
-  // Generamos los campos de la opcion
+  // Generamos los campos del paso
   // Nombre
   const stepCounter = document.createElement('span')
   stepCounter.innerText = `Paso ${i + 1}`
@@ -178,7 +190,6 @@ function addStepForm (i, isUpdate, id) {
   const nameInput = document.createElement('input')
   nameInput.name = `nameStep${i}`
   nameInput.type = 'text'
-  nameInput.required = true
   nameDiv.append(nameInput)
 
   stepForm.append(nameDiv)
@@ -187,12 +198,12 @@ function addStepForm (i, isUpdate, id) {
   const imageDiv = document.createElement('div')
 
   const imageLabel = document.createElement('label')
-  imageLabel.for = `imagenOpt${i}`
+  imageLabel.for = `imageStep${i}`
   imageLabel.append('Imagen:')
   imageDiv.append(imageLabel)
 
   const imageInput = document.createElement('input')
-  imageInput.name = `imagenOpt${i}`
+  imageInput.name = `imageStep${i}`
   imageInput.type = 'file'
   imageInput.accept = 'image/*'
   imageDiv.append(imageInput)
@@ -236,14 +247,15 @@ function addStepForm (i, isUpdate, id) {
 
   // Evento para borrar la opcion
   eraseButton.onclick = (e) => {
-    // Si el contenedor es de clase stepUpdate no lo borraremos de la interfaz si no que se ocultara para luego
+    // Si el contenedor es de clase stepUpdate no lo borraremos si no que se ocultara para luego
     // Poder acceder a sus datos para realizar la consulta de delete
     let div = e.target.closest('.stepUpdate')
+    console.log(div)
     if (div !== null) {
       div.style.display = 'none'
     }
-    // Si el contenedor es de clase step lo eliminaremos de la interfaz
-    div = e.target.closest('.step')
+    // Si el contenedor es de clase step y no stepUpdate lo eliminaremos de la interfaz
+    div = e.target.closest('.step:not(.stepUpdate)')
     if (div !== null) {
       div.remove()
     }
@@ -266,19 +278,19 @@ if (!isLogged()) {
 const form = document.forms.guia
 showParts(form.part)
 const addStepButton = document.querySelector('#addStepButton')
-let stepsQuantity = 0
-
 // Si tiene una id, se muestran los datos de la guia
 if (id > 0) {
-  showGuide(id, form)
+  setTimeout(() => showGuide(id, form), 20)
+
   // Mostramos el boton para borrar la pieza
   const delButton = document.createElement('button')
   delButton.className = 'deleteBtn'
   delButton.type = 'button'
-  delButton.innerText = 'Borrar pieza'
-  delButton.onclick = () => {
+  delButton.innerText = 'Borrar guia'
+  delButton.onclick =(e) => {
+    e.preventDefault()
     if (window.confirm('¿Está seguro de que quiere borrar la pieza de manera permanente?') === true) {
-      // deletePart(id)
+      deleteGuide(id)
       window.location.href = './index.html'
     }
   }
@@ -286,14 +298,14 @@ if (id > 0) {
   delDiv.append(delButton)
 }
 
-// Creacion de los select de categorias
+// Creacion de los select de los pasos
 addStepButton.onclick = function (e) {
-  addStepForm(stepsQuantity)
-  stepsQuantity++
+  addStepForm(howManySteps())
   console.log(document.querySelectorAll('.step'))
 }
 
 // Evento submit del formulario
+console.log(form)
 form.onsubmit = (e) => {
   e.preventDefault()
   // Prevents HTML handling submission
@@ -301,28 +313,55 @@ form.onsubmit = (e) => {
   // Creamos un formData al que pasarle todos los datos del formulario
   const formData = new FormData()
 
+  // Guardamos el email
+  const user = JSON.parse(window.localStorage.getItem('user'))
+
   formData.append('title', form.title.value)
   formData.append('intro', form.intro.value)
   formData.append('time', form.time.value)
   formData.append('difficulty', form.difficulty.value)
+  formData.append('email', user.email)
   formData.append('part', form.part.value)
   // Si la guia tiene que actualizar la imagen
   if (form.imagen.files[0] !== undefined) {
     formData.append('files', form.imagen.files[0])
+    // Le añadimos un booleano para que el back pueda saber si la imagen es de la guia o de un paso
+    formData.append('imageUpload', true)
   }
   const stepsArr = []
   let i = 0
   for (const step of steps) {
-    const file = eval('form.imagenOpt' + i)
-    // Si la opcion se tiene que actualizar porque ya existia lo marcamos
-    let update = step.className === 'stepUpdate'
-    // Si la opcion ha sido borrada de la interfaz
+    const instructions = document.querySelectorAll(`.step${i}Instruction`)
+    console.log(instructions, `step${i}Instruction`)
+    const instructionsArr = []
+    let j = 0
+    for (const instruction of instructions) {
+      let updateInstruction = instruction.classList.contains('instructionUpdate')
+      // Si la instruccion ha sido borrada de la interfaz
+      const isDelete = instruction.style.display === 'none'
+      if (isDelete) {
+        updateInstruction = false
+      }
+      instructionsArr.push({
+        id: instruction.id,
+        text: eval(`form.step${i}Instruction${j}Text.value`),
+        type: eval(`form.step${i}Instruction${j}Type.value`),
+        updateInstruction,
+        isDelete
+      })
+      j++
+    }
+    const file = eval(`form.imageStep${i}`)
+    // Si el paso se tiene que actualizar porque ya existia lo marcamos
+    let update = step.classList.contains('stepUpdate')
+    // Si el paso ha sido borrada de la interfaz
     const isDelete = step.style.display === 'none'
 
     if (isDelete) {
       update = false
     }
-    // Si la opcion tiene que actualizar la imagen
+    // Si el paso tiene que actualizar la imagen
+    console.log(file)
     const imageUpload = file.files[0] !== undefined
     if (imageUpload && !isDelete) {
       formData.append('files', file.files[0])
@@ -330,24 +369,25 @@ form.onsubmit = (e) => {
     // Appends value of text input
     stepsArr.push({
       id: step.id,
-      name: eval('form.nombreOpt' + i + '.value'),
-      price: eval('form.precioOpt' + i + '.value'),
+      name: eval(`form.nameStep${i}.value`),
       update,
       imageUpload,
-      isDelete
+      isDelete,
+      instructions: instructionsArr
     })
 
     i++
   }
+  console.log(stepsArr)
   const stepsJson = JSON.stringify(stepsArr)
   console.log(stepsJson)
   formData.append('steps', stepsJson)
   if (howManySteps() > 0) {
-    // if (id > 0) {
-    //   updatePart(id, formData)
-    // } else {
-    //   insertPart(formData)
-    // }
+    if (id > 0) {
+      updateGuide(id, formData)
+    } else {
+      insertGuide(formData)
+    }
   } else {
     window.alert('La pieza necesita como mínimo 1 opción')
   }

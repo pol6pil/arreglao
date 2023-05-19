@@ -2,7 +2,7 @@
 const express = require('express')
 const router = express.Router()
 // Recibimos los metodos de las piezas del controlador de las piezas
-const part = require('../controller/guidesController')
+const guide = require('../controller/guidesController')
 const multer = require('multer')
 const path = require('path')
 const { randomInt } = require('crypto')
@@ -39,12 +39,12 @@ function checkFileType (file, cb) {
 }
 
 // Rutas de pieza
-router.get('/accepted', part.getAcceptedGuides)
+router.get('/accepted', guide.getAcceptedGuides)
 // router.get('/pending', part.getPendingGuides)
-router.get('/:id', part.getGuide)
+router.get('/:id', guide.getGuide)
 // router.get('/part/:id', part.getGuideByPart)
-// router.post('/', upload.array('files'), part.addGuide)
-// router.put('/:id', upload.array('files'), part.editGuide)
-// router.delete('/:id', part.deleteGuide)
+router.post('/', upload.array('files'), guide.addGuide)
+router.put('/:id', upload.array('files'), guide.editGuide)
+router.delete('/:id', guide.deleteGuide)
 
 module.exports = router

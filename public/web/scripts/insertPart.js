@@ -83,8 +83,15 @@ async function showPart (id, form) {
   form.nota.value = json.note
   form.garantia.value = json.warranty
 
-  form.electronico.selectedIndex = json.appliance - 1
-  form.categoria.selectedIndex = json.category - 1
+  // Recorremos las opciones de los select para mostrar la opcion correcta
+  const optionsAppliance = form.electronico.querySelectorAll('option')
+  for (const optionAppliance of optionsAppliance) {
+    optionAppliance.selected = optionAppliance.value === json.appliance.toString()
+  }
+  const optionsCategory = form.categoria.querySelectorAll('option')
+  for (const optionCategory of optionsCategory) {
+    optionCategory.selected = optionCategory.value === json.category.toString()
+  }
 
   // Mostramos las opciones de la parte
 
