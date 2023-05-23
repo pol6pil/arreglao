@@ -42,10 +42,11 @@ function checkFileType (file, cb) {
 router.get('/accepted/:id', guide.getAcceptedGuidesByAppliance)
 router.get('/pending/:id', guide.getPendingGuides)
 router.get('/:id', guide.getGuide)
-// router.get('/part/:id', part.getGuideByPart)
+router.get('/part/:id', guide.getGuideByPart)
+router.get('/user/:email', guide.getGuideByUser)
 router.post('/', upload.array('files'), guide.addGuide)
 router.put('/:id', upload.array('files'), guide.editGuide)
-router.put('/:id', guide.acceptGuide)
+router.put('/accept/:id', guide.acceptGuide)
 router.delete('/:id', guide.deleteGuide)
 
 module.exports = router

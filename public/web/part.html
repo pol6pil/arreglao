@@ -6,9 +6,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="./scripts/generic/userChecker.js"></script>
+    <script src="./scripts/generic/showGuide.js"></script>
     <script src="./scripts/header.js" defer></script>
     <script src="./scripts/part.js" defer></script>
-    <title>Pieza - </title>
+    <title>Arreglao - </title>
 </head>
 
 <body>
@@ -20,18 +21,20 @@
                 <span id="productInfoPrice"></span>
                 <div>
                     <input type="number" name="quantity" id="quantity" value="1" min="1" step="1">
-                    <button class="blueButton">Añadir al carrito</button>
+                    <button type="button" id="addPart" class="blueButton">Añadir al carrito</button>
                 </div>
 
             </div>
         </section>
         <section id="productDetail">
             <h2>Detalles del producto</h2>
-            <div>
-                <span>DESCRIPCION</span>
-                <p></p>
+            <div id="mainDetail">
+                <div>
+                    <span>DESCRIPCION</span>
+                    <p></p>
+                </div>
             </div>
-            <div>
+            <div id="asideDetail">
                 <div>
                     <span>COMPATIBILIDAD</span>
                     <a href="" id="partAppliance"></a>

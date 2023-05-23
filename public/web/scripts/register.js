@@ -8,7 +8,7 @@ async function register (formData) {
     window.alert('Usuario registrado exitosamente')
     const json = await res.json()
     // eslint-disable-next-line no-undef
-    saveUser(json.email, json.isAdmin)
+    saveUser(json)
   }
 }
 

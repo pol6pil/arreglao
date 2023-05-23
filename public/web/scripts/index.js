@@ -32,7 +32,12 @@ async function showAppliances (count, div) {
 function showAppliance (appliance, div) {
   const article = document.createElement('article')
   const a = document.createElement('a')
-  a.setAttribute('href', `./parts.html?appliance=${appliance.id}`)
+  // eslint-disable-next-line no-undef
+  if (!isAdmin()) {
+    a.setAttribute('href', `./parts.html?appliance=${appliance.id}`)
+  } else {
+    a.setAttribute('href', `./insertappliance.html?id=${appliance.id}`)
+  }
   const img = document.createElement('img')
   img.setAttribute('src', appliance.imgUrl)
   a.append(img)

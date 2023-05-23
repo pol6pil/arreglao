@@ -33,6 +33,7 @@ async function showGuides (isAdmin, div) {
   // Mostramos las guias
   if (guides.length > 0) {
     for (const guide of guides) {
+      // eslint-disable-next-line no-undef
       showGuide(guide, div)
     }
   } else {
@@ -41,22 +42,6 @@ async function showGuides (isAdmin, div) {
     div.append(error)
   }
 }
-
-function showGuide (guide, div) {
-  // Mostramos la guia
-  const article = document.createElement('article')
-  const a = document.createElement('a')
-  a.setAttribute('href', `./guide.html?id=${guide.id}`)
-  const aDiv = document.createElement('div')
-  const span = document.createElement('span')
-  span.append(guide.name)
-  aDiv.append(span)
-  const img = document.createElement('img')
-  img.setAttribute('src', guide.imgUrl)
-  aDiv.append(img)
-  a.append(aDiv)
-  article.append(a)
-  div.append(article)
-}
 const guidesSection = document.querySelector('#guides')
-showGuides(false, guidesSection)
+// eslint-disable-next-line no-undef
+showGuides(isAdmin(), guidesSection)

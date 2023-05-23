@@ -56,4 +56,5 @@ form.onsubmit = (e) => {
   } else {
     submitAppliance(formData)
   }
+  window.location.href = './index.html'
 }

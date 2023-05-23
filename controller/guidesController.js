@@ -33,6 +33,7 @@ module.exports.getAcceptedGuidesByAppliance = async (req, res) => {
       res.send(guidesJson)
     }
   } catch (error) {
+    console.log(error)
     res.status(400).send({ error: 'select failed' })
   }
 }
@@ -64,6 +65,7 @@ module.exports.getPendingGuides = async (req, res) => {
       res.send(guidesJson)
     }
   } catch (error) {
+    console.log(error)
     res.status(400).send({ error: 'select failed' })
   }
 }
@@ -145,6 +147,63 @@ module.exports.getGuide = async (req, res) => {
     res.status(400).send({ error: 'invalid id' })
   }
 }
+
+module.exports.getGuideByPart = async (req, res) => {
+  const partId = Number(req.params.id) || 0
+  // Si el id se ha marcado hacemos la consulta
+  if (partId > 0) {
+    // Consulta a la bbdd con la consulta almacenada
+    const guideSql = await con.query('SELECT * FROM guias WHERE aceptada = 1 AND id_pieza = ?', [partId])
+    // Procesamos las filas para poder enviarlas
+    const guide = guideSql[0][0]
+    if (guide !== undefined) {
+      let instrucctions
+      // Consula a la bbdd de los pasos de la guia
+      const stepsSql = await con.query('SELECT * FROM pasos WHERE id_guia = ?', [guide.id_guia])
+      const steps = stepsSql[0]
+      for (const step of steps) {
+        // Consula a la bbdd de las instrucciones del paso
+        const instrucctionsSql = await con.query('SELECT * FROM instrucciones WHERE id_paso = ?', [step.id_paso])
+        instrucctions = instrucctionsSql[0]
+      }
+      res.send(guideModel.toJson(guide, steps, instrucctions))
+    } else {
+      res.send(null)
+    }
+  } else {
+    // Si el id no es valido enviamos un error
+    res.status(400).send({ error: 'invalid id' })
+  }
+}
+
+module.exports.getGuideByUser = async (req, res) => {
+  const email = req.params.email || 0
+  // Si el id se ha marcado hacemos la consulta
+  if (email !== 0) {
+    // Consulta a la bbdd con la consulta almacenada
+    const guideSql = await con.query('SELECT * FROM guias WHERE email = ?', [email])
+    // Procesamos las filas para poder enviarlas
+    const guide = guideSql[0][0]
+    if (guide !== undefined) {
+      let instrucctions
+      // Consula a la bbdd de los pasos de la guia
+      const stepsSql = await con.query('SELECT * FROM pasos WHERE id_guia = ?', [guide.id_guia])
+      const steps = stepsSql[0]
+      for (const step of steps) {
+        // Consula a la bbdd de las instrucciones del paso
+        const instrucctionsSql = await con.query('SELECT * FROM instrucciones WHERE id_paso = ?', [step.id_paso])
+        instrucctions = instrucctionsSql[0]
+      }
+      res.send(guideModel.toJson(guide, steps, instrucctions))
+    } else {
+      res.send(null)
+    }
+  } else {
+    // Si el id no es valido enviamos un error
+    res.status(400).send({ error: 'invalid id' })
+  }
+}
+
 module.exports.addGuide = async (req, res) => {
   console.log(req.body)
   if (typeof req.body === 'undefined') {
@@ -213,6 +272,7 @@ module.exports.acceptGuide = async (req, res) => {
       res.send({ message: 'guide accepted successfully' })
     }
   } catch (error) {
+    console.log(error)
     res.status(400).send({ error: 'select failed' })
   }
 }

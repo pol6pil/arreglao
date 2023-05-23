@@ -38,6 +38,9 @@ async function mostrarHeader () {
   searchForm.append(searchInput)
   searchForm.append(searchButton)
   divActions.append(searchForm)
+  let cart = document.createElement('a')
+  cart.append('Carrito')
+  cart.setAttribute('href', './cart.html')
 
   // Si el usuario no esta logeado
   if (window.localStorage.getItem('user') === null) {
@@ -61,6 +64,7 @@ async function mostrarHeader () {
       divActions.append(pfpA)
     } else {
       aboutUs.remove()
+      cart = null
       const insertPart = document.createElement('a')
       insertPart.setAttribute('href', './insertPart.html')
       insertPart.append('Crear pieza nueva')
@@ -75,6 +79,9 @@ async function mostrarHeader () {
     logoff.onclick = () => { window.localStorage.removeItem('user') }
     logoff.append('Cerrar Sesion')
     divActions.append(logoff)
+  }
+  if (cart !== null) {
+    divActions.append(cart)
   }
   header.append(divActions)
   document.body.prepend(header)

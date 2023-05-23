@@ -30,7 +30,7 @@ async function showGuide (id) {
   // Mostramos la duracion
   const durationDiv = document.createElement('div')
   const durationSpan = document.createElement('span')
-  durationSpan.append(guide.duration)
+  durationSpan.append(`${guide.duration} minutos`)
   durationDiv.id = 'duration'
   durationDiv.append(durationSpan)
   guideInfoDiv.append(durationDiv)
@@ -70,10 +70,58 @@ async function showGuide (id) {
     showStep(step, stepsDiv, stepIndex)
     stepIndex++
   }
+
+  // Mostramos el boton para aceptar la guia
+  // eslint-disable-next-line no-undef
+  if (isAdmin()) {
+    const introHeaderDiv = document.querySelector('#introContent div:first-child')
+    if (guide.accepted === 0) {
+      const acceptButton = document.createElement('button')
+      acceptButton.append('Aceptar guía')
+      acceptButton.type = 'button'
+      acceptButton.onclick = async () => {
+        const message = await acceptGuide(guide.id)
+        // Si se ha aceptado con exito lo mostramos
+        if (message.message !== undefined) {
+          window.alert('Guia aceptada exitosamente')
+          window.location.href = './index.html'
+        }
+      }
+      introHeaderDiv.append(acceptButton)
+    }
+    const deleteButton = document.createElement('button')
+    deleteButton.append('Borrar guia')
+    deleteButton.type = 'button'
+    deleteButton.className = 'eraseButton'
+    deleteButton.onclick = async () => {
+      const message = await deleteGuide(guide.id)
+      // Si se ha aceptado con exito lo mostramos
+      if (message.message !== undefined) {
+        window.alert('Guia borrada exitosamente')
+        window.location.href = './index.html'
+      }
+    }
+    introHeaderDiv.append(deleteButton)
+  }
+}
+
+async function deleteGuide (id) {
+  const res = await fetch(`http://localhost/guides/${id}`, {
+    method: 'DELETE'
+  })
+  return await res.json()
+}
+
+async function acceptGuide (id) {
+  const res = await fetch(`http://localhost/guides/accept/${id}`, {
+    method: 'PUT'
+  })
+  return await res.json()
 }
 
 function showStep (step, div, i) {
   const article = document.createElement('article')
+  article.id = `step${i}`
   // Mostramos el numero del paso y el nombre si tiene
   const titleDiv = document.createElement('div')
   article.append(titleDiv)
@@ -123,5 +171,11 @@ function showInstruction (instruction, ul) {
 
 const urlParams = new URLSearchParams(window.location.search)
 const guideId = urlParams.get('id') || 0
+console.log(guideId)
+
+// Si no hay ninguna guia, redirigimos la pagina
+if (guideId === 0) {
+  window.location.href = './error.html'
+}
 
 showGuide(guideId)

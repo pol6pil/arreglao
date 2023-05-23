@@ -9,7 +9,7 @@ async function login (formData) {
     console.log('todo ok')
     // Iniciamos sesion
     // eslint-disable-next-line no-undef
-    saveUser(json.email, json.isAdmin)
+    saveUser(json)
   } else {
     clearErrors()
     if (json.error === 'user not found') {

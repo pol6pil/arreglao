@@ -1,7 +1,13 @@
 'use strict'
 async function mostrarPieza (id) {
   const part = await obtenerPieza(id)
-  console.log(part)
+  const title = document.querySelector('title')
+  title.append(part.name)
+  const cartButton = document.querySelector('#addPart')
+  const quantity = document.querySelector('#quantity')
+  cartButton.onclick = () => {
+    addPartCart(part, quantity.value)
+  }
 
   // Mostramos la pieza
   const productOverview = document.querySelector('#productOverview')
@@ -9,6 +15,7 @@ async function mostrarPieza (id) {
   const divImage = document.createElement('div')
   divImage.className = 'productImage'
   const image = document.createElement('img')
+  image.id = 'partImage'
   divImage.append(image)
 
   const price = document.querySelector('#productInfoPrice')
@@ -18,7 +25,7 @@ async function mostrarPieza (id) {
   const h1 = document.querySelector('#divProductInfo h1')
   h1.append(part.name)
 
-  const description = document.querySelector('#productDetail p')
+  const description = document.querySelector('#mainDetail p')
   description.append(part.description)
 
   const partWarranty = document.querySelector('#partWarranty')
@@ -31,6 +38,10 @@ async function mostrarPieza (id) {
     partWarranty.append('Garantia de por vida')
   }
 
+  // Mostramos la guia disponible para la pieza
+  const asideDetailDiv = document.querySelector('#asideDetail')
+  showPartGuide(part.id, asideDetailDiv)
+
   // Obtenemos el electrodomestico para mostrar el nombre
   const appliance = await obtenerElectrodomestico(part.appliance)
   const partAppliance = document.querySelector('#partAppliance')
@@ -40,12 +51,12 @@ async function mostrarPieza (id) {
 
   // Si el producto tiene nota se muestra
   if (part.note.length > 0) {
-    const div = document.querySelector('#productDetail div:first-child')
+    const div = document.querySelector('#mainDetail')
     showInfoBox('note', part.note, div)
   }
   // Igual con la advertencia
   if (part.warning.length > 0) {
-    const div = document.querySelector('#productDetail div:first-child')
+    const div = document.querySelector('#mainDetail')
     showInfoBox('warning', part.warning, div)
   }
 
@@ -79,6 +90,7 @@ async function mostrarPieza (id) {
 
 function mostrarOpcion (option, img, span) {
   img.setAttribute('src', option.imgUrl)
+  img.alt = option.id
   span.innerText = `${option.price}€`
 }
 
@@ -112,12 +124,70 @@ function showInfoBox (type, content, div) {
 
   div.append(infoDiv)
 }
+
+async function showPartGuide (partId, div) {
+  // Obtenemos la guia
+  const guide = await getGuide(partId)
+  if (guide !== null) {
+    // Mostramos la guia
+  // eslint-disable-next-line no-undef
+    showGuide(guide, div)
+  }
+}
+
+async function getGuide (partId) {
+  const res = await fetch(`http://localhost/guides/part/${partId}`)
+  return await res.json()
+}
+
 // async function mostrarReviews () {
 
 // }
 
 // async function obtenerReviews (id) {
 // }
+
+// Funcion para añadir al carrito la pieza
+function addPartCart (part, quantity) {
+  // Si no existe creamos el carrito
+  if (window.localStorage.getItem('cart') === null) {
+    window.localStorage.setItem('cart', JSON.stringify([]))
+  }
+
+  // Añadimos la pieza al carrito
+  const cart = JSON.parse(window.localStorage.getItem('cart'))
+
+  // GARRAFAL ERROR DE SEGURIDAD!!!!! (Si dios quiere tengo tiempo para arreglarlo)
+  // const price = Number(((document.querySelector('#productInfoPrice').innerText).slice(0, -1)))
+
+  // Se pudo arreglar :)
+  const optionId = Number(document.querySelector('#partImage').alt)
+  const option = part.options.find(option => option.id === optionId)
+  const partCart = {
+    id: part.id,
+    name: part.name,
+    quantity: Number(quantity),
+    price: option.price,
+    imgUrl: option.imgUrl,
+    optionId: option.id
+  }
+  let alreadyInCart = false
+  // Si el producto esta en el carrito, le sumamos la cantidad
+  for (const product of cart) {
+    if (product.optionId === partCart.optionId) {
+      product.quantity += partCart.quantity
+      alreadyInCart = true
+    }
+  }
+  // Si el producto no esta en carrito se añade
+  if (!alreadyInCart) {
+    cart.push(partCart)
+  }
+
+  window.localStorage.setItem('cart', JSON.stringify(cart))
+
+  window.location.href = './cart.html'
+}
 
 // Obtenemos el id de la pieza deseada
 const urlParams = new URLSearchParams(window.location.search)

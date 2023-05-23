@@ -24,7 +24,6 @@ function howManyInstructionsInStep (step) {
 }
 
 async function insertGuide (formData) {
-  console.log('a')
   const res = await fetch('http://localhost/guides', {
     method: 'POST',
     body: formData // Payload is formData object
@@ -287,7 +286,7 @@ if (id > 0) {
   delButton.className = 'deleteBtn'
   delButton.type = 'button'
   delButton.innerText = 'Borrar guia'
-  delButton.onclick =(e) => {
+  delButton.onclick = (e) => {
     e.preventDefault()
     if (window.confirm('¿Está seguro de que quiere borrar la pieza de manera permanente?') === true) {
       deleteGuide(id)
@@ -378,7 +377,6 @@ form.onsubmit = (e) => {
 
     i++
   }
-  console.log(stepsArr)
   const stepsJson = JSON.stringify(stepsArr)
   console.log(stepsJson)
   formData.append('steps', stepsJson)

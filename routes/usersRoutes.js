@@ -43,7 +43,8 @@ function checkFileType (file, cb) {
 router.post('/login', upload.array('files'), user.login)
 router.get('/:email', user.getPfp)
 router.post('/', upload.array('files'), user.register)
-router.put('/:email', upload.array('files'), user.update)
+router.put('/:email/balance', upload.array('files'), user.updateBalance)
+router.put('/:email/changePfp', upload.array('files'), user.changePfp)
 // router.delete('/:id', part.deletePart)
 
 module.exports = router
