@@ -7,7 +7,7 @@ module.exports.toJson = (rawOrder, rawParts) => {
     parts.push(
       {
         id: part.id_pieza,
-        option: part.id_pieza,
+        option: part.id_opcion,
         quantity: part.cantidad,
         price: part.precio
       }

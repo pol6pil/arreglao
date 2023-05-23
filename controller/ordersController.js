@@ -20,8 +20,8 @@ module.exports.getUserOrders = async (req, res) => {
     const rowsJson = []
     for (const row of rows) {
     // Consula a la bbdd de las opciones de la pieza
-      const options = await con.query('SELECT * FROM pedido_pieza WHERE id_pedido = ?', [row.id_pedido])
-      rowsJson.push(order.toJson(row, options[0]))
+      const parts = await con.query('SELECT * FROM pedido_pieza WHERE id_pedido = ?', [row.id_pedido])
+      rowsJson.push(order.toJson(row, parts[0]))
     }
     res.send(rowsJson)
   } catch (error) {

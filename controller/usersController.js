@@ -43,17 +43,18 @@ module.exports.getPfp = async (req, res) => {
   if (email === 0) {
     // Si el email no es valido enviamos un error
     res.status(400).send({ error: 'user not found' })
-  }
-  // Conexion a la bbdd
+  } else {
+    // Conexion a la bbdd
   // Almacenamos la consulta en un string
-  const consult = 'SELECT foto FROM usuarios WHERE email = ?'
-  // Consulta a la bbdd con la consulta almacenada
-  const sqlResponse = await con.query(consult, email)
+    const consult = 'SELECT foto FROM usuarios WHERE email = ?'
+    // Consulta a la bbdd con la consulta almacenada
+    const sqlResponse = await con.query(consult, email)
 
-  // Comprobamos si el usuario existe
-  // Obtencion del usuario
-  const imgUrl = user.getImage(sqlResponse[0])
-  res.send(imgUrl)
+    // Comprobamos si el usuario existe
+    // Obtencion del usuario
+    const imgUrl = user.getImage(sqlResponse[0])
+    res.send(imgUrl)
+  }
 }
 module.exports.register = async (req, res) => {
   const email = req.body.email || 0
@@ -85,91 +86,48 @@ module.exports.register = async (req, res) => {
   }
 }
 
-module.exports.update = async (req, res) => {
-//   const partId = req.params.id || 0
-//   if (partId > 0) {
-//     if (typeof req.body === 'undefined') {
-//       res.json({
-//         status: 'error',
-//         message: 'data is undefined'
-//       })
-//     } else {
-//       const connection = await con.getConnection()
-//       // Hacemos una transaccion para poder insertar tanto como las piezas como las opciones
-//       try {
-//         await connection.beginTransaction()
-//         // Editamos la pieza la pieza
-//         const query1 = 'UPDATE `piezas` SET `nombre`=?,`descripcion`=?,`garantia`=?,`advertencia`=?,`nota`=?,`id_categoria`=?,`id_electrodomestico`=? WHERE `id_pieza`=?'
-//         await con.query(query1,
-//           [req.body.name, req.body.description, req.body.warranty, req.body.warning, req.body.note, req.body.category, req.body.appliance, partId])
-//         const options = JSON.parse(req.body.options)
+module.exports.updateBalance = async (req, res) => {
+  const email = req.params.email || 0
+  if (email === 0) {
+    // Si el email no es valido enviamos un error
+    res.status(400).send({ error: 'user not found' })
+  } else {
+    try {
+    // Almacenamos la consulta en un string
+      const consult = 'UPDATE usuarios SET saldo=? WHERE email=?'
+      // Consulta a la bbdd con la consulta almacenada
+      await con.query(consult, [req.body.balance, email])
 
-  //         // Creamos un indice para recorrer los archivos de las opciones
-  //         let fileIndex = 0
-  //         for (const option of options) {
-  //           // Comprobamos si la opcion tiene que ser insertada o actualizada
-  //           if (option.update) {
-  //             // Si se ha insertado una imagen la subimos a la bbdd
-  //             if (option.imageUpload) {
-  //               // Obtenemos la imagen antes de modificar las opciones para luego poder borrar la imagen
-  //               const imgUrl = await getOptionImage(option.id)
-  //               // Actualizamos la opcion en la bbdd
-  //               const queryOption = `UPDATE opciones_piezas SET nombre='${option.name}',imagen='${req.files[fileIndex].filename}',precio=${option.price} WHERE id_opcion=${option.id}`
-  //               await con.query(queryOption)
-  //               fileIndex++
-  //               // Borramos la imagen anterior
-  //               deleteFile(path.join(process.cwd(), '/public/images/parts/', imgUrl))
-  //             } else {
-  //               const queryOption = `UPDATE opciones_piezas SET nombre='${option.name}', precio=${option.price} WHERE id_opcion=${option.id}`
-  //               await con.query(queryOption)
-  //             }
-  //             // Comprobamos si la opcion se tiene que borrar
-  //           } else if (option.isDelete) {
-  //             // Obtenemos la imagen para poder borrarla
-  //             const imgUrl = await getOptionImage(option.id)
-
-  //             // Borramos la opcion
-  //             await deleteOption(option.id)
-
-  //             // Borramos la imagen
-  //             deleteFile(path.join(process.cwd(), '/public/images/parts/', imgUrl))
-  //           } else {
-  //             if (option.imageUpload) {
-  //               const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `imagen`, `precio`, `id_pieza`) VALUES (?,?,?,?)'
-  //               await con.query(queryOption, [option.name, req.files[fileIndex].filename, option.price, partId])
-  //               fileIndex++
-  //             } else {
-  //               const queryOption = 'INSERT INTO `opciones_piezas`(`nombre`, `precio`, `id_pieza`) VALUES (?,?,?)'
-  //               await con.query(queryOption, [option.name, option.price, partId])
-  //             }
-  //           }
-  //         }
-
-  //         // Devolvemos el json del producto añadido si todo esta bien (reutilizamos codigo)
-  //         res.send(await getPartSql(partId))
-  //         await connection.commit()
-  //         // Si da error la insercion, borramos la imagen y hacemos un rollback a la transaccion
-  //       } catch (error) {
-  //         await connection.rollback()
-  //         // Borramos todas las imagenes
-  //         for (let i = 0; i < JSON.parse(req.body.options).length; i++) {
-  //           if (req.files[i] !== undefined) {
-  //             deleteFile(path.join(process.cwd(), '/public/images/parts/', req.files[i].filename))
-  //           }
-  //         }
-
-//         console.log(error)
-//         res.status(400).send({ error: 'update failed' })
-//       }
-//     }
-//   }
+      res.send({ status: 'ok' })
+    } catch (error) {
+      console.log(error)
+      res.status(400).send({ error: 'failed update' })
+    }
+  }
 }
 
-async function getOptionImage (id) {
-  // Consulta a la bbdd con la opcion
-  const sqlResponse = await con.query('SELECT imagen FROM opciones_piezas WHERE id_opcion = ?', [id])
-  return sqlResponse[0][0].imagen
+module.exports.changePfp = async (req, res) => {
+  const email = req.params.email || 0
+  if (email === 0) {
+    // Si el email no es valido enviamos un error
+    res.status(400).send({ error: 'user not found' })
+  } else {
+    try {
+    // Almacenamos la consulta en un string
+      const consult = 'UPDATE usuarios SET foto=? WHERE email = ?'
+      // Consulta a la bbdd con la consulta almacenada
+      await con.query(consult, [req.files[0].filename, email])
+
+      // Obtencion de la nueva foto de perfil
+      const imgUrl = user.getImage(email)
+      res.send(imgUrl)
+    } catch (error) {
+      console.log(error)
+      res.status(400).send({ error: 'failed update' })
+    }
+  }
 }
+
 async function getUser (email) {
   // Consulta a la bbdd con la opcion
   const sqlResponse = await con.query('SELECT * FROM usuarios WHERE email = ?', [email])

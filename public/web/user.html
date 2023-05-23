@@ -9,18 +9,22 @@
     <script src="./scripts/generic/userChecker.js"></script>
     <script src="./scripts/generic/showGuide.js" defer></script>
     <script src="./scripts/header.js" defer></script>
-    <script src="./scripts/index.js" defer></script>
+    <script src="./scripts/user.js" defer></script>
 </head>
 
 <body>
     <main>
         <section id="orders">
+            <h2>Pedidos realizados:</h2>
             <article>
-                <img src="" alt="">
-                <span></span>
-                <span></span>
-                <span></span>
-                <a href="">Escribir reseña</a>
+                <h2></h2>
+                <div>   
+                    <img src="" alt="">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <a href="">Escribir reseña</a>
+                </div>
             </article>
         </section>
         <aside>
@@ -31,11 +35,11 @@
             <div>
                 <span>Imagen de perfil</span>
                 <img id="pfp" src="" alt="">
-                <input type="file" name="imagen" accept="image/*">
+                <input id="imageInput" type="file" name="imagen" accept="image/*">
                 <button id="changePfp" type="button">Cambiar imagen</button>
             </div>
             <div>
-                <span>Saldo: </span>
+                <span id="balance"></span>
                 <button id="addBalance" type="button">Añadir 300€</button>
             </div>
             <section>

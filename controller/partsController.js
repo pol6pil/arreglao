@@ -125,7 +125,6 @@ module.exports.getPart = async (req, res) => {
   }
 }
 module.exports.addPart = async (req, res) => {
-  console.log(req.body)
   if (typeof req.body === 'undefined') {
     res.json({
       status: 'error',
@@ -268,7 +267,6 @@ module.exports.deletePart = async (req, res) => {
       // Obtenemos las imagenes de las opciones de la pieza
       const sqlResponse = await con.query('SELECT * FROM opciones_piezas WHERE id_pieza = ?', [partId])
       const options = sqlResponse[0]
-      console.log(options)
       // Borramos las imagenes de las opciones
       for (const option of options) {
         deleteFile(path.join(process.cwd(), '/public/images/parts/', option.imagen))
