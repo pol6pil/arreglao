@@ -52,7 +52,7 @@ module.exports.getPfp = async (req, res) => {
 
     // Comprobamos si el usuario existe
     // Obtencion del usuario
-    const imgUrl = user.getImage(sqlResponse[0])
+    const imgUrl = user.getImage(sqlResponse[0][0])
     res.send(imgUrl)
   }
 }
@@ -118,8 +118,14 @@ module.exports.changePfp = async (req, res) => {
       // Consulta a la bbdd con la consulta almacenada
       await con.query(consult, [req.files[0].filename, email])
 
+      const consultSelect = 'SELECT foto FROM usuarios WHERE email = ?'
+      // Consulta a la bbdd con la consulta almacenada
+      const sqlResponse = await con.query(consultSelect, email)
+      console.log(sqlResponse[0][0])
+
       // Obtencion de la nueva foto de perfil
-      const imgUrl = user.getImage(email)
+      const imgUrl = user.getImage(sqlResponse[0][0])
+      console.log(imgUrl)
       res.send(imgUrl)
     } catch (error) {
       console.log(error)

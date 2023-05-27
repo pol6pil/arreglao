@@ -109,8 +109,12 @@ function buyCart (cart) {
         formData.append('parts', JSON.stringify(cart))
         window.localStorage.setItem('user', JSON.stringify(user))
         placeOrder(formData)
+        updateBalance(user)
         // Limpiamos el carrito
         window.localStorage.removeItem('cart')
+
+        // Volvemos al indice
+        window.location.href = './index.html'
       } else {
         // Si el usuario no tiene suficiente saldo se muestra
         window.alert('Saldo insuficiente')
@@ -121,6 +125,15 @@ function buyCart (cart) {
   } else {
     window.alert('No hay productos en el carrito')
   }
+}
+
+async function updateBalance (user) {
+  const formData = new FormData()
+  formData.append('balance', user.balance)
+  await fetch(`http://localhost/users/${user.email}/balance`, {
+    method: 'PUT',
+    body: formData
+  })
 }
 
 async function placeOrder (formData) {

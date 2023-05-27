@@ -1,11 +1,16 @@
 'use strict'
 
 // eslint-disable-next-line no-unused-vars
-function showGuide (guide, div) {
+function showGuide (guide, div, isOwner) {
   // Mostramos la guia
   const article = document.createElement('article')
   const a = document.createElement('a')
-  a.setAttribute('href', `./guide.html?id=${guide.id}`)
+  if (isOwner) {
+    a.setAttribute('href', `./guideForm.html?id=${guide.id}`)
+  } else {
+    a.setAttribute('href', `./guide.html?id=${guide.id}`)
+  }
+
   const aDiv = document.createElement('div')
   const span = document.createElement('span')
   span.append(guide.name)

@@ -1,0 +1,241 @@
+
+:root {
+    --ancho: 60vw;
+    --anchoMax: 1200px;
+    --anchoMin: 400px;
+    --grisOscuro: #393E46;
+    --blanco: #FFFFFF;
+    --grisClaro: #EEEEEE;
+    --azul: #0071CE;
+    --azulHover: #0b66b1;
+    --negroAzulado: #222831;
+
+}
+body {
+    font-family: Open-Sans, Arial, Helvetica, sans-serif;
+    margin: 0px;
+    display: grid;
+    justify-content: center;
+    align-content: flex-start;
+    justify-items: center;
+    align-items: stretch;
+    grid-template-columns: 100%;
+
+}
+header {
+    display: flex;
+    justify-content: space-between;
+    width: var(--ancho);
+    max-width: var(--anchoMax);
+    min-width: var(--anchoMin);
+    margin: auto;
+    height: 64px;
+}
+
+header form{
+    background-color: var(--grisOscuro);
+    border-radius: 100px;
+    height: 30px;
+    padding: 5px;
+    width: 100%;
+    min-width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+header form input{
+    background-color: transparent;
+    border: 0px;
+    width: 100%;
+    color: var(--grisClaro);
+}
+header form input:focus{
+    background-color: transparent;
+    border: 0px;
+    outline: 0px;
+}
+
+header div{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 100%;
+    gap: 10px;
+}
+
+header a {
+    color: var(--grisClaro);
+    text-decoration: none;
+    text-align: center;
+    vertical-align: middle;
+    transition: all 0.3s;
+}
+header a:hover {
+    color: var(--azul);
+    transition: all 0.3s;
+}
+
+#searchButton {
+    background-color: transparent;
+    border: none;
+}
+#searchButton img{
+    width: 20px;
+}
+.pfpImage {
+    width: 32px;
+    height: 32px;
+    border-radius: 100%;
+}
+.blackBg {
+    background-color: var(--negroAzulado);
+    width: 100vw;
+}
+main {
+    margin: 0px;
+    width: 100vw;
+    background-color: var(--blancodis);
+}
+section,
+footer {
+    max-width: var(--anchoMax);
+    min-width: var(--anchoMin);
+    margin: auto;
+    padding: 20px;
+}
+.blueButton{
+    background-color: var(--azul);
+    text-decoration: none;
+    color: #FFF;
+    padding: 10px;
+    border-radius: 5px;
+    transition: all 0.2s;
+}
+.blueButton:hover{
+    background-color: var(--azulHover);
+    transition: all 0.2s;
+}
+p{
+    font-size: 20px;
+}
+
+h2{
+    color: var(--negroAzulado);
+}
+
+.partDisplay a{
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+    min-height: 600px;
+    text-decoration: none;
+    transition: all 0.2s;
+    justify-content: space-around;
+}
+.partDisplay a:hover{
+    box-shadow: 3px 3px 10px 1px var(--grisOscuro);
+    transition: all 0.2s;
+}
+h3{
+    color: var(--negroAzulado);
+}
+.partDisplay p{
+    color: var(--grisOscuro);
+}
+.partDisplay span{
+    color: var(--azul);
+}
+.partDisplay img{
+    width: 100%;
+    min-width: 235px;
+    max-width: 300px;
+}
+
+.greyBg {
+    background-color: var(--grisClaro);
+    width: 100vw;
+}
+
+footer {
+    min-height: 300px;
+    display: grid;
+    grid-template-rows: 1fr 65px;
+}
+
+#footerContact{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#footerContact div{
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+#footerContact div span{
+    font-weight: bold;
+    text-align: right;
+}
+
+#footerContact div span:last-child{
+    color: var(--azul);
+}
+
+footer>div {
+    display: grid;
+    justify-content: space-between;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+}
+
+#footerRedes {
+    width: 180px;
+    height: 50px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+#footerRedes a img {
+    position: absolute;
+    transition: all 0.5s;
+}
+
+#footerRedes a {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    border: 1px solid var(--grisOscuro);
+    border-radius: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.5s;
+}
+
+#footerRedes a:hover {
+    background-color: var(--azul);
+    border-radius: 100px;
+    transition: all 0.5s;
+}
+
+#legal {
+    border-top: 1px solid var(--grisOscuro);
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 0px;
+}
+
+#legal a {
+    text-decoration: none;
+    font-size: 14px;
+    color: var(--grisOscuro);
+    transition: all 0.3s;
+}
+#legal a:hover {
+    color: var(--azul);
+    transition: all 0.3s;
+}

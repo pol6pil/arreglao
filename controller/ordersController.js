@@ -4,33 +4,35 @@ const order = require('../model/order')
 const con = require('../middleware/sqlconnection')
 // Funcionalidades de la api respecto a piezas
 module.exports.getUserOrders = async (req, res) => {
-  try {
-    const email = req.query.email || 0
+  const email = req.params.email || 0
+  if (email !== 0) {
+    try {
+      // Conexion a la bbdd
+      // Almacenamos la consulta en un string para luego modificarlo
+      const consult = 'SELECT * FROM pedidos WHERE email = ?'
+      // Consulta a la bbdd con la consulta almacenada
+      const sqlResponse = await con.query(consult, [email])
 
-    // Conexion a la bbdd
-    // Almacenamos la consulta en un string para luego modificarlo
-    const consult = 'SELECT * FROM pedidos WHERE email = ?'
-    // Consulta a la bbdd con la consulta almacenada
-    const sqlResponse = await con.query(consult, [email])
+      // Obtencion de las filas devueltas
+      const rows = sqlResponse[0]
 
-    // Obtencion de las filas devueltas
-    const rows = sqlResponse[0]
-
-    // Procesamos las filas para poder enviarlas
-    const rowsJson = []
-    for (const row of rows) {
-    // Consula a la bbdd de las opciones de la pieza
-      const parts = await con.query('SELECT * FROM pedido_pieza WHERE id_pedido = ?', [row.id_pedido])
-      rowsJson.push(order.toJson(row, parts[0]))
+      // Procesamos las filas para poder enviarlas
+      const rowsJson = []
+      for (const row of rows) {
+      // Consula a la bbdd de las opciones de la pieza
+        const parts = await con.query('SELECT * FROM pedido_pieza WHERE id_pedido = ?', [row.id_pedido])
+        rowsJson.push(order.toJson(row, parts[0]))
+      }
+      res.send(rowsJson)
+    } catch (error) {
+      res.status(400).send({ error: 'select failed' })
     }
-    res.send(rowsJson)
-  } catch (error) {
-    res.status(400).send({ error: 'select failed' })
+  } else {
+    res.send([])
   }
 }
 
 module.exports.addOrder = async (req, res) => {
-  console.log(req.body)
   if (typeof req.body === 'undefined') {
     res.json({
       status: 'error',

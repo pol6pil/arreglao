@@ -2,6 +2,7 @@
 // eslint-disable-next-line no-unused-vars
 function mostrarParte (part, div) {
   const article = document.createElement('article')
+  article.classList.add('partDisplay')
   const a = document.createElement('a')
   // eslint-disable-next-line no-undef
   if (isAdmin()) {

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arreglao - Perfil</title>
+    <script src="./scripts/generic/userChecker.js"></script>
+    <script src="./scripts/generic/showPart.js" defer></script>
+    <script src="./scripts/header.js" defer></script>
+    <script src="./scripts/review.js" defer></script>
+    <link rel="stylesheet" href="./styles/review.css">
+</head>
+
+<body>
+    <main>
+        <h1>Escribir reseña</h1>
+        <form action="#" method="post" name="review">
+        <div>
+            <h2>Pieza:</h2>
+            <div id="part"></div>
+        </div>
+        <div>
+            <span>Titulo:</span>
+            <input type="text" required name="title">
+        </div>
+        <div>
+            <span>Puntuacion:</span>
+            <ul class="rating">
+                <li class="rating-item" data-rate="1"></li>
+                <li class="rating-item" data-rate="2"></li>
+                <li class="rating-item active" data-rate="3"></li>
+                <li class="rating-item" data-rate="4"></li>
+                <li class="rating-item" data-rate="5"></li>
+            </ul>
+        </div>
+        <div>
+            <span>Contenido de la reseña:</span>
+            <textarea required style="resize: none;" name="content" id="" cols="30" rows="10"></textarea>
+        </div>
+        <input type="submit" value="Subir reseña">
+        </form>
+    </main>
+    
+</body>
+
+</html>

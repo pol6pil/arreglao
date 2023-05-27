@@ -386,6 +386,7 @@ form.onsubmit = (e) => {
     } else {
       insertGuide(formData)
     }
+    window.location.href = './index.html'
   } else {
     window.alert('La pieza necesita como mínimo 1 opción')
   }

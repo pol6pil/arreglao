@@ -4,11 +4,15 @@
 
 async function obtenerPfp (email) {
   const res = await fetch(`http://localhost/users/${email}`)
-  return await res.json()
+  const json = await res.json()
+  return json.imgUrl
 }
 
 async function mostrarHeader () {
+  const blackBg = document.createElement('div')
+  blackBg.classList.add('blackBg')
   const header = document.createElement('header')
+  blackBg.append(header)
   const divLinks = document.createElement('div')
   const aboutUs = document.createElement('a')
   aboutUs.setAttribute('href', './aboutUs.html')
@@ -31,6 +35,7 @@ async function mostrarHeader () {
   searchInput.type = 'text'
   searchInput.placeholder = 'Buscar'
   const searchButton = document.createElement('button')
+  searchButton.id = 'searchButton'
   searchButton.type = 'submit'
   const searchIcon = document.createElement('img')
   searchIcon.setAttribute('src', './images/icons/search.png')
@@ -58,7 +63,8 @@ async function mostrarHeader () {
     if (user.isAdmin === 0) {
       const pfpA = document.createElement('a')
       const pfpImg = document.createElement('img')
-      pfpImg.setAttribute('src', (await obtenerPfp(user.email)).imgUrl)
+      pfpImg.className = 'pfpImage'
+      pfpImg.setAttribute('src', (await obtenerPfp(user.email)))
       pfpA.append(pfpImg)
       pfpA.setAttribute('href', './user.html')
       divActions.append(pfpA)
@@ -84,6 +90,6 @@ async function mostrarHeader () {
     divActions.append(cart)
   }
   header.append(divActions)
-  document.body.prepend(header)
+  document.body.prepend(blackBg)
 }
 mostrarHeader()

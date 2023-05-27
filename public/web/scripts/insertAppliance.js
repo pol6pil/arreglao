@@ -1,19 +1,15 @@
 'use strict'
 async function submitAppliance (formData) {
-  const res = await fetch('http://localhost:80/appliances', {
+  await fetch('http://localhost:80/appliances', {
     method: 'POST',
     body: formData
   })
-  const json = await res.json()
-  console.log(json)
 }
 async function updateAppliance (formData, id) {
-  const res = await fetch(`http://localhost:80/appliances/${id}`, {
+  await fetch(`http://localhost:80/appliances/${id}`, {
     method: 'PUT',
     body: formData
   })
-  const json = await res.json()
-  console.log(json)
 }
 
 async function showAppliance (id, form, divImg) {

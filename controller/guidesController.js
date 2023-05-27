@@ -181,20 +181,23 @@ module.exports.getGuideByUser = async (req, res) => {
   // Si el id se ha marcado hacemos la consulta
   if (email !== 0) {
     // Consulta a la bbdd con la consulta almacenada
-    const guideSql = await con.query('SELECT * FROM guias WHERE email = ?', [email])
+    const guidesSql = await con.query('SELECT * FROM guias WHERE email = ?', [email])
     // Procesamos las filas para poder enviarlas
-    const guide = guideSql[0][0]
-    if (guide !== undefined) {
+    const guides = []
+    for (const guide of guidesSql[0]) {
       let instrucctions
       // Consula a la bbdd de los pasos de la guia
       const stepsSql = await con.query('SELECT * FROM pasos WHERE id_guia = ?', [guide.id_guia])
       const steps = stepsSql[0]
       for (const step of steps) {
-        // Consula a la bbdd de las instrucciones del paso
+      // Consula a la bbdd de las instrucciones del paso
         const instrucctionsSql = await con.query('SELECT * FROM instrucciones WHERE id_paso = ?', [step.id_paso])
         instrucctions = instrucctionsSql[0]
       }
-      res.send(guideModel.toJson(guide, steps, instrucctions))
+      guides.push(guideModel.toJson(guide, steps, instrucctions))
+    }
+    if (guides.length > 0) {
+      res.send(guides)
     } else {
       res.send(null)
     }
@@ -425,16 +428,20 @@ async function getGuideSql (id) {
   const guideSql = await con.query('SELECT * FROM guias WHERE id_guia = ?', [id])
   // Procesamos las filas para poder enviarlas
   const guide = guideSql[0][0]
-  let instrucctions
-  // Consula a la bbdd de los pasos de la guia
-  const stepsSql = await con.query('SELECT * FROM pasos WHERE id_guia = ?', [id])
-  const steps = stepsSql[0]
-  for (const step of steps) {
+  if (guide !== undefined) {
+    let instrucctions
+    // Consula a la bbdd de los pasos de la guia
+    const stepsSql = await con.query('SELECT * FROM pasos WHERE id_guia = ?', [id])
+    const steps = stepsSql[0]
+    for (const step of steps) {
     // Consula a la bbdd de las instrucciones del paso
-    const instrucctionsSql = await con.query('SELECT * FROM instrucciones WHERE id_paso = ?', [step.id_paso])
-    instrucctions = instrucctionsSql[0]
+      const instrucctionsSql = await con.query('SELECT * FROM instrucciones WHERE id_paso = ?', [step.id_paso])
+      instrucctions = instrucctionsSql[0]
+    }
+    return guideModel.toJson(guide, steps, instrucctions)
+  } else {
+    return null
   }
-  return guideModel.toJson(guide, steps, instrucctions)
 }
 
 async function addInstruction (instruction, stepId) {

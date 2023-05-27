@@ -20,6 +20,7 @@ const imgRoute = require('./routes/imgRoutes')
 const usersRoute = require('./routes/usersRoutes')
 const guidesRoute = require('./routes/guidesRoutes')
 const ordersRoute = require('./routes/ordersRoutes')
+const reviewsRoute = require('./routes/reviewsRoutes')
 
 // middleware
 app.use(express.static(path.join(__dirname, '/public')))
@@ -39,6 +40,7 @@ app.use('/images', imgRoute)
 app.use('/users', usersRoute)
 app.use('/guides', guidesRoute)
 app.use('/orders', ordersRoute)
+app.use('/reviews', reviewsRoute)
 
 // Escucha al puerto
 app.listen(PORT, () => console.log(`Server iniciado en puerto ${PORT}`))

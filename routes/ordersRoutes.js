@@ -4,7 +4,7 @@ const router = express.Router()
 const multer = require('multer')
 const upload = multer()
 
-// Recibimos los metodos de las electrodomesticos del controlador de las electrodomesticos
+// Recibimos los metodos de los pedidos del controlador de los pedidos
 const order = require('../controller/ordersController')
 
 // Rutas de pedidos

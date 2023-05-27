@@ -86,6 +86,8 @@ async function mostrarPieza (id) {
   }
 
   productOverview.prepend(divImage)
+
+  showReviews(id)
 }
 
 function mostrarOpcion (option, img, span) {
@@ -135,17 +137,77 @@ async function showPartGuide (partId, div) {
   }
 }
 
+async function getPfp (email) {
+  const res = await fetch(`http://localhost/users/${email}`)
+  const json = await res.json()
+  return json.imgUrl
+}
+
 async function getGuide (partId) {
   const res = await fetch(`http://localhost/guides/part/${partId}`)
   return await res.json()
 }
 
-// async function mostrarReviews () {
+async function showReviews (id) {
+  const section = document.querySelector('#reviews')
+  const reviews = await getReviews(id)
+  for (const review of reviews) {
+    showReview(review, section)
+  }
+}
 
-// }
+async function showReview (review, div) {
+  const article = document.createElement('article')
+  const userDiv = document.createElement('div')
+  article.append(userDiv)
+  // Mostramos la foto de perfil
+  const pfp = document.createElement('img')
+  userDiv.append(pfp)
+  const imgUrl = await getPfp(review.email)
+  pfp.setAttribute('src', imgUrl)
+  // Mostramos el correo
+  const emailSpan = document.createElement('span')
+  userDiv.append(emailSpan)
+  emailSpan.append(review.email)
 
-// async function obtenerReviews (id) {
-// }
+  // Mostramos la puntuacion
+  const guideTitleDiv = document.createElement('div')
+  article.append(guideTitleDiv)
+  const score = document.createElement('ul')
+  guideTitleDiv.append(score)
+  score.className = 'rating'
+  for (let i = 0; i < 5; i++) {
+    const scoreStar = document.createElement('li')
+    score.append(scoreStar)
+    scoreStar.className = 'rating-item'
+    scoreStar.setAttribute('data-rate', i + 1)
+    if (i + 1 === review.score) {
+      scoreStar.classList.add('active')
+    }
+  }
+  // Mostramos el titulo
+  const title = document.createElement('h3')
+  guideTitleDiv.append(title)
+  title.textContent = review.title
+
+  // Mostramos el contenido de la review
+  const contentDiv = document.createElement('div')
+  const p = document.createElement('p')
+  p.textContent = review.content
+  contentDiv.append(p)
+  article.append(contentDiv)
+
+  div.append(article)
+}
+
+async function getReviews (id) {
+  const res = await fetch(`http://localhost/reviews/${id}`)
+  return await res.json()
+}
+
+function getTotalScore (reviews) {
+
+}
 
 // Funcion para añadir al carrito la pieza
 function addPartCart (part, quantity) {

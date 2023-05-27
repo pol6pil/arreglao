@@ -1,0 +1,101 @@
+#aboutUsBanner{
+    background-image: url('../images/bg.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    object-fit: fill;
+    display: flex;
+    min-height: 300px;
+    align-items: baseline;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    color: #FFF;
+    padding: 0px;
+}
+
+#aboutUsBanner h2{
+    color: #FFF;
+    font-size: 30px;
+}
+
+#aboutUsBanner p{
+    text-align: center;
+    width: 75%;
+}
+
+#partsGuidesBanner {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    min-height: 400px;
+}
+
+#partsGuidesBanner article {
+    background-color: var(--grisClaro);
+    display: flex;
+    gap: 40px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+#partsGuidesBanner article p {
+    color: var(--grisOscuro);
+    width: 75%;
+    text-align: center;
+}
+#partsGuidesBanner article h2 {
+    font-size: 38px;
+}
+#partsGuidesBanner article *{
+    margin: 0px;
+}
+
+#recentParts h2{
+    grid-column: 1 / span 4;
+}
+
+#recentParts{
+    display: grid;
+    grid-template-rows: 60px 1fr;
+    grid-template-columns: 1fr 1fr;
+    min-height: 600px;
+}
+#appliances h2{
+    grid-column: 1 / span 2;
+}
+
+#appliances{
+    display: grid;
+    gap: 15px;
+    grid-template-rows: 60px repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+    min-height: 600px;
+}
+
+#appliances article a{
+    text-decoration: none;
+    height: 150px;
+    padding: 10px;
+    background-color: var(--grisOscuro);
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+#appliances article a:hover{
+    transform: translateY(-10px);
+    box-shadow: 2px 2px 5px 1px black;
+    transition: all 0.2s;
+}
+
+#appliances article a span{
+    color: #FFF;
+    font-weight: bold;
+    font-size: 30px;
+}
+
+#appliances article img{
+    max-height: 150px;
+}

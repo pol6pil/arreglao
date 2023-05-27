@@ -1,21 +1,23 @@
 'use strict'
 
 module.exports.toJson = (rawOrder, rawParts) => {
-  // Procesamos las imagenes para que contengan peticiones a la api
   const parts = []
-  for (const part of rawParts) {
-    parts.push(
-      {
-        id: part.id_pieza,
-        option: part.id_opcion,
-        quantity: part.cantidad,
-        price: part.precio
-      }
-    )
+  if (rawParts !== undefined) {
+    for (const part of rawParts) {
+      parts.push(
+        {
+          id: part.id_pieza,
+          option: part.id_opcion,
+          quantity: part.cantidad,
+          price: part.precio
+        }
+      )
+    }
   }
+
   return {
     id: rawOrder.id_pedido,
-    date: rawOrder.fecha,
+    date: rawOrder.fecha.toISOString().slice(0, 10),
     parts
   }
 }
