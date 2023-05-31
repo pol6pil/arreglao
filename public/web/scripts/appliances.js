@@ -6,29 +6,21 @@ async function getAllAppliances () {
   const divAppliances = document.querySelector('#appliances')
 
   for (const appliance of json) {
-    showAppliance(divAppliances, appliance)
+    showAppliance(appliance, divAppliances)
   }
 }
-getAllAppliances()
-
-function showAppliance (div, appliance) {
-  const divAppliance = document.createElement('div')
-  divAppliance.className = 'appliance'
+function showAppliance (appliance, div) {
+  const article = document.createElement('article')
   const a = document.createElement('a')
+  // eslint-disable-next-line no-undef
   a.setAttribute('href', `./parts.html?appliance=${appliance.id}`)
-  const adiv = document.createElement('div')
-  const h3 = document.createElement('h3')
-  h3.append(appliance.name)
-
-  const imgApp = document.createElement('img')
-  imgApp.setAttribute('src', appliance.imgUrl)
-  imgApp.alt = appliance.name
-
-  adiv.append(h3)
-  adiv.append(imgApp)
-
-  a.append(adiv)
-  divAppliance.append(a)
-
-  div.append(divAppliance)
+  const img = document.createElement('img')
+  img.setAttribute('src', appliance.imgUrl)
+  a.append(img)
+  const span = document.createElement('span')
+  span.append(appliance.name)
+  a.append(span)
+  article.append(a)
+  div.append(article)
 }
+getAllAppliances()

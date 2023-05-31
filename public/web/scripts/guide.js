@@ -14,17 +14,18 @@ async function showGuide (id) {
   const guide = await getGuide(id)
   console.log(guide)
   // Rellemanos la seccion de presentacion
-  const presentation = document.querySelector('#presentation')
+  const presentationDiv = document.querySelector('#presentationDiv')
   const presentationImg = document.createElement('img')
   presentationImg.alt = guide.name
   presentationImg.setAttribute('src', guide.imgUrl)
-  presentation.prepend(presentationImg)
+  presentationDiv.prepend(presentationImg)
   const presentationH1 = document.querySelector('#presentation h1')
   presentationH1.append(guide.name)
   const presentationAuthor = document.querySelector('#author')
   presentationAuthor.append(guide.user)
 
   const guideInfoDiv = document.querySelector('#guideInfo')
+  const presentation = document.querySelector('#presentation')
   presentation.append(guideInfoDiv)
 
   // Mostramos la duracion
@@ -33,7 +34,7 @@ async function showGuide (id) {
   durationSpan.append(`${guide.duration} minutos`)
   durationDiv.id = 'duration'
   durationDiv.append(durationSpan)
-  guideInfoDiv.append(durationDiv)
+  guideInfoDiv.prepend(durationDiv)
 
   // Mostramos la difficultad
   const difficultyDiv = document.createElement('div')
@@ -50,7 +51,7 @@ async function showGuide (id) {
     difficultyDiv.className += ' hard'
     difficultySpan.append('Dificil')
   }
-  guideInfoDiv.append(difficultyDiv)
+  guideInfoDiv.prepend(difficultyDiv)
 
   // Mostramos la introduccion
   const introDiv = document.querySelector('#introContent')
@@ -74,11 +75,12 @@ async function showGuide (id) {
   // Mostramos el boton para aceptar la guia
   // eslint-disable-next-line no-undef
   if (isAdmin()) {
-    const introHeaderDiv = document.querySelector('#introContent div:first-child')
+    const introHeaderDiv = document.querySelector('#guideInfo')
     if (guide.accepted === 0) {
       const acceptButton = document.createElement('button')
       acceptButton.append('Aceptar guía')
       acceptButton.type = 'button'
+      acceptButton.className = 'blueButton'
       acceptButton.onclick = async () => {
         const message = await acceptGuide(guide.id)
         // Si se ha aceptado con exito lo mostramos

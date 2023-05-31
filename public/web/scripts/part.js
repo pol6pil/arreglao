@@ -151,8 +151,15 @@ async function getGuide (partId) {
 async function showReviews (id) {
   const section = document.querySelector('#reviews')
   const reviews = await getReviews(id)
-  for (const review of reviews) {
-    showReview(review, section)
+  if (reviews.length > 0) {
+    showTotalScore(reviews)
+    for (const review of reviews) {
+      showReview(review, section)
+    }
+  } else {
+    const span = document.createElement('span')
+    span.textContent = 'Todavía no se ha escrito ninguna reseña!'
+    section.append(span)
   }
 }
 
@@ -163,6 +170,7 @@ async function showReview (review, div) {
   // Mostramos la foto de perfil
   const pfp = document.createElement('img')
   userDiv.append(pfp)
+  pfp.className = 'pfpImage'
   const imgUrl = await getPfp(review.email)
   pfp.setAttribute('src', imgUrl)
   // Mostramos el correo
@@ -205,8 +213,13 @@ async function getReviews (id) {
   return await res.json()
 }
 
-function getTotalScore (reviews) {
-
+function showTotalScore (reviews) {
+  const span = document.querySelector('#scoreTotal')
+  let sumScore = 0
+  for (const review of reviews) {
+    sumScore += review.rating
+  }
+  span.textContent = `${sumScore / reviews.length}/5`
 }
 
 // Funcion para añadir al carrito la pieza

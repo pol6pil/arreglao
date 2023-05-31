@@ -4,6 +4,7 @@
 function showGuide (guide, div, isOwner) {
   // Mostramos la guia
   const article = document.createElement('article')
+  article.className = 'guide'
   const a = document.createElement('a')
   if (isOwner) {
     a.setAttribute('href', `./guideForm.html?id=${guide.id}`)
@@ -11,14 +12,12 @@ function showGuide (guide, div, isOwner) {
     a.setAttribute('href', `./guide.html?id=${guide.id}`)
   }
 
-  const aDiv = document.createElement('div')
   const span = document.createElement('span')
   span.append(guide.name)
-  aDiv.append(span)
+  a.append(span)
   const img = document.createElement('img')
   img.setAttribute('src', guide.imgUrl)
-  aDiv.append(img)
-  a.append(aDiv)
+  a.append(img)
   article.append(a)
   div.append(article)
 }

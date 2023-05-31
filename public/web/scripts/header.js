@@ -68,6 +68,10 @@ async function mostrarHeader () {
       pfpA.append(pfpImg)
       pfpA.setAttribute('href', './user.html')
       divActions.append(pfpA)
+      const guidesForm = document.createElement('a')
+      guidesForm.setAttribute('href', './guideForm.html')
+      guidesForm.append('Escribir guia')
+      divLinks.append(guidesForm)
     } else {
       aboutUs.remove()
       cart = null

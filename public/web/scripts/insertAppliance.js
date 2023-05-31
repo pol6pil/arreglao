@@ -32,9 +32,9 @@ const form = document.forms.appliance
 
 // Mostramos los datos del electrodomestico
 if (id > 0) {
-  const main = document.querySelector('main')
+  const container = document.querySelector('main form div:nth-child(2)')
   const divImg = document.createElement('div')
-  main.append(divImg)
+  container.append(divImg)
   showAppliance(id, form, divImg)
 }
 

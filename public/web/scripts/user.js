@@ -42,32 +42,33 @@ async function showPart (div, partId, optionId, quantity, price) {
 
   // Obtenemos la opcion
   const option = part.options.find(opt => opt.id === optionId)
-  console.log(option)
+  const partDiv = document.createElement('div')
   // Mostramos la imagen de la opcion
   const img = document.createElement('img')
-  div.append(img)
+  partDiv.append(img)
   img.setAttribute('src', option.imgUrl)
   img.alt = option.imgUrl
 
   // Mostramos el nombre de la opcion
   const nameSpan = document.createElement('span')
   nameSpan.append(option.name)
-  div.append(nameSpan)
+  partDiv.append(nameSpan)
 
   // Mostramos la cantidad y el precio
   const quantitySpan = document.createElement('span')
   quantitySpan.append(`${quantity} unidades`)
-  div.append(quantitySpan)
+  partDiv.append(quantitySpan)
 
   const priceSpan = document.createElement('span')
   priceSpan.append(`${price}€/u`)
-  div.append(priceSpan)
+  partDiv.append(priceSpan)
 
   // Mostramos el enlace para escribir la review
   const reviewA = document.createElement('a')
   reviewA.append('Escribir reseña')
   reviewA.setAttribute('href', `./writeReview.html?part=${partId}`)
-  div.append(reviewA)
+  partDiv.append(reviewA)
+  div.append(partDiv)
 }
 
 async function getUserOrders (email) {
@@ -83,7 +84,7 @@ async function showGuides (email) {
   // Las mostramos
   for (const guide of guides) {
     // eslint-disable-next-line no-undef
-    showGuide(guide, section)
+    showGuide(guide, section, true)
   }
 }
 

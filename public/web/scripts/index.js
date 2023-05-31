@@ -31,6 +31,7 @@ async function showAppliances (count, div) {
 
 function showAppliance (appliance, div) {
   const article = document.createElement('article')
+  article.className = 'appliance'
   const a = document.createElement('a')
   // eslint-disable-next-line no-undef
   if (!isAdmin()) {

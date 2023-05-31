@@ -238,7 +238,7 @@ if (id > 0) {
   showPart(id, form)
   // Mostramos el boton para borrar la pieza
   const delButton = document.createElement('button')
-  delButton.className = 'deleteBtn'
+  delButton.className = 'eraseButton'
   delButton.type = 'button'
   delButton.innerText = 'Borrar pieza'
   delButton.onclick = () => {

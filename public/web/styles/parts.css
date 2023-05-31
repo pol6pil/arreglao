@@ -1,0 +1,41 @@
+section{
+    display: grid;
+    grid-template-columns: 250px 1fr;
+}
+#partes{
+    grid-column: 2 / span 2;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+#ordenarPor{
+    display: flex;
+    flex-direction: column;
+    align-items:end;
+    padding: 0px;
+    position: relative;
+}
+#ordenarPorDropdown{
+    z-index: 20;
+    position: absolute;
+    top: 40px;
+    background-color: var(--grisClaro);
+    padding: 15px;
+    border-radius: 15px;
+}
+
+aside{
+    grid-row: 1 / span 2;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: var(--grisClaro);
+    height: fit-content;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+#categoriasFiltrar{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}

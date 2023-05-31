@@ -76,7 +76,6 @@ async function showGuide (id, form) {
 
   // Recorremos las opciones del select de las piezas para mostrar la opcion correcta
   const options = form.part.querySelectorAll('option')
-  console.log(options)
   for (const option of options) {
     console.log(option.value === json.part.toString(), option.value, json.part.toString())
     option.selected = option.value === json.part.toString()
@@ -93,7 +92,6 @@ async function showGuide (id, form) {
     const imageDiv = document.querySelector(`#step${howManySteps() - 1}Image`)
     imageDiv.append(stepImg)
     for (const instruction of step.instructions) {
-      console.log(instruction)
       const instructionsDiv = document.querySelector(`#instructionsStep${howManySteps() - 1}`)
       addInstructionForm(instructionsDiv, howManyInstructionsInStep(howManySteps() - 1), howManySteps() - 1, true, instruction.id)
       eval(`form.step${howManySteps() - 1}Instruction${howManyInstructionsInStep(howManySteps() - 1) - 1}Text.value = instruction.instruction`)
@@ -135,6 +133,7 @@ function addInstructionForm (div, i, stepNum, isUpdate, id) {
   textDiv.append(textSpan)
   const instructionText = document.createElement('input')
   instructionText.type = 'text'
+  instructionText.className = 'instruction'
   instructionText.required = true
   instructionText.name = `step${stepNum}Instruction${i}Text`
   textDiv.append(instructionText)
@@ -177,6 +176,7 @@ function addStepForm (i, isUpdate, id) {
   // Nombre
   const stepCounter = document.createElement('span')
   stepCounter.innerText = `Paso ${i + 1}`
+  stepCounter.className = 'title'
   stepHeader.append(stepCounter)
 
   const nameDiv = document.createElement('div')
@@ -213,28 +213,29 @@ function addStepForm (i, isUpdate, id) {
   }
   stepForm.append(imageDiv)
   // Creamos la lista para las instrucciones
+  const instructionsDivContainer = document.createElement('div')
   const instructionsDiv = document.createElement('div')
+  instructionsDivContainer.append(instructionsDiv)
   instructionsDiv.id = `instructionsStep${i}`
   const instructionsHeader = document.createElement('span')
   instructionsHeader.append('Instrucciones:')
+  instructionsHeader.className = 'title'
   instructionsDiv.append(instructionsHeader)
-  stepForm.append(instructionsDiv)
 
   // Boton para crear instrucciones en el paso
   const addInstructionButton = document.createElement('button')
   addInstructionButton.type = 'button'
+  addInstructionButton.className = 'blueButton'
   addInstructionButton.append('+')
   addInstructionButton.onclick = () => {
-    console.log(instructionsDiv, howManyInstructionsInStep(i), i)
     addInstructionForm(instructionsDiv, howManyInstructionsInStep(i), i)
   }
-  stepForm.append(addInstructionButton)
+  instructionsDivContainer.append(addInstructionButton)
   // Creacion del boton para eliminar la opcion
   const eraseButton = document.createElement('button')
   eraseButton.type = 'button'
   eraseButton.append('X')
   eraseButton.className = 'eraseButton'
-  stepHeader.append(eraseButton)
 
   if (isUpdate) {
     stepDiv.className += ' stepUpdate'
@@ -260,6 +261,8 @@ function addStepForm (i, isUpdate, id) {
     }
   }
   stepContent.append(stepForm)
+  stepContent.append(instructionsDivContainer)
+  stepContent.append(eraseButton)
   stepDiv.append(stepHeader)
   stepDiv.append(stepContent)
   stepsDiv.append(stepDiv)
@@ -281,14 +284,14 @@ const addStepButton = document.querySelector('#addStepButton')
 if (id > 0) {
   setTimeout(() => showGuide(id, form), 20)
 
-  // Mostramos el boton para borrar la pieza
+  // Mostramos el boton para borrar la guia
   const delButton = document.createElement('button')
-  delButton.className = 'deleteBtn'
+  delButton.className = 'eraseButton'
   delButton.type = 'button'
   delButton.innerText = 'Borrar guia'
   delButton.onclick = (e) => {
     e.preventDefault()
-    if (window.confirm('¿Está seguro de que quiere borrar la pieza de manera permanente?') === true) {
+    if (window.confirm('¿Está seguro de que quiere borrar la guia de manera permanente?') === true) {
       deleteGuide(id)
       window.location.href = './index.html'
     }

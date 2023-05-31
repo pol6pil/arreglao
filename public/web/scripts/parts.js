@@ -7,20 +7,27 @@ async function obtenerPartes (appliance, orderBy, desc) {
     fetchQuerry = 'http://localhost/parts'
   }
   // Si queremos ordenar las partes se ordenan
-  if (orderBy !== undefined) {
+  if (orderBy !== undefined && orderBy !== 'precio') {
     fetchQuerry += `?orderBy=${orderBy}`
   }
-  if (desc === 1) {
+  if (desc === 1 && orderBy !== 'precio') {
     fetchQuerry += '&desc=1'
   }
   const res = await fetch(fetchQuerry)
-  return await res.json()
+  const json = await res.json()
+  if (orderBy === 'precio') {
+    if (desc === 1) {
+      json.sort((a, b) => a.options[0].price - b.options[0].price)
+    } else {
+      json.sort((a, b) => b.options[0].price - a.options[0].price)
+    }
+  }
+  return json
 }
 
 async function mostrarPartes (appliance, orderBy, desc) {
   // Obtenemos las partes a mostrar
   const parts = await obtenerPartes(appliance, orderBy, desc)
-
   // Mostramos las partes
   const partsDiv = document.querySelector('#partes')
   for (const part of parts) {
@@ -56,7 +63,6 @@ function actualizarPartes (categories, parts) {
   // Filtramos por el precio
   const price = document.querySelector('#priceInput').value
   parts = parts.filter(part => part.options[0].price <= price)
-  console.log(parts)
 
   // Si no hay ninguna categoria filtrada mostraremos todas
   if (checkedCategories.length === 0) {
@@ -126,24 +132,27 @@ function mostrarFiltroPrecio (categories, parts) {
   const span = document.createElement('span')
   span.append('Filtrar por precio')
 
+  const priceContainer = document.createElement('div')
   const price = document.createElement('span')
-  price.append(maxPrice)
+  price.append(`${maxPrice}€`)
   price.id = 'priceOutput'
 
   const priceRange = document.createElement('input')
   priceRange.id = 'priceInput'
   priceRange.type = 'range'
+  priceRange.step = '.01'
   priceRange.value = maxPrice
   priceRange.max = maxPrice
   priceRange.min = minPrice
   priceRange.oninput = (e) => {
     const priceOutput = document.querySelector('#priceOutput')
-    priceOutput.innerText = e.target.value
+    priceOutput.innerText = `${e.target.value}€`
   }
   priceRange.onchange = () => actualizarPartes(categories, parts)
   div.append(span)
-  div.append(price)
-  div.append(priceRange)
+  div.append(priceContainer)
+  priceContainer.append(price)
+  priceContainer.append(priceRange)
 
   aside.append(div)
 }
@@ -151,7 +160,7 @@ function mostrarFiltroPrecio (categories, parts) {
 // Funcion que vacia las partes
 function clearParts () {
   // Vaciamos el div que contiene las partes
-  const aParts = document.querySelectorAll('#partes a')
+  const aParts = document.querySelectorAll('#partes article')
 
   for (const aPart of aParts) {
     aPart.remove()
@@ -166,7 +175,14 @@ mostrarPartes(appliance)
 // Evento onclick para el dropdown de ordenar partes
 window.onclick = (e) => {
   const dropdownContent = document.querySelector('#ordenarPorDropdown')
+  let show = false
   if (e.target.id !== 'ordenarPorButton') {
+    show = false
+  } else {
+    // Estoy orgulloso de esto
+    show = dropdownContent.style.display === 'none'
+  }
+  if (!show) {
     dropdownContent.style.display = 'none'
   } else {
     dropdownContent.style.display = 'block'
@@ -180,17 +196,18 @@ for (const dropdown of dropdowns) {
     clearParts()
 
     // ESTE TROZO DE CODIGO NO ME GUSTA !!!!!!!!!!!!
+    // El aside de categorias esta enlazado con mostrarPartes por lo que causa duplicados
+    // Hay que borrarlos, si me da tiempo lo arreglare
     const filtroPrecio = document.querySelector('#filtroPrecio')
     filtroPrecio.remove()
     const categoriasFiltrarArr = document.querySelectorAll('#categoriasFiltrar div')
-    console.log(categoriasFiltrarArr)
     for (const categoriasFiltrar of categoriasFiltrarArr) {
-      console.log(categoriasFiltrar)
       categoriasFiltrar.remove()
     }
 
     const urlParams = new URLSearchParams(window.location.search)
     const appliance = urlParams.get('appliance') || 0
+    console.log(dropdown.id, appliance)
     if (dropdown.id === 'sort1') {
       mostrarPartes(appliance, 'nombre')
     } else if (dropdown.id === 'sort2') {

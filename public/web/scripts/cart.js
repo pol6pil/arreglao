@@ -76,9 +76,11 @@ function showPart (part, div) {
 function deletePart (part) {
   // Mostramos un confirm al usuario
   if (window.confirm(`Esta seguro que quiere eliminar ${part.name} del carrito?`)) {
-    // Borramos la pieza de la interfaz
-    const article = document.querySelector(`#option${part.optionId}`)
-    article.remove()
+    // Borramos la piezas de la interfaz
+    const articles = document.querySelectorAll('#products article')
+    for (const article of articles) {
+      article.remove()
+    }
     // Borramos la pieza del carrito
     let cart = JSON.parse(window.localStorage.getItem('cart'))
     cart = cart.filter(item => item.optionId !== part.optionId)
@@ -89,7 +91,7 @@ function deletePart (part) {
       window.localStorage.removeItem('cart')
       cart = null
     }
-    // Volvemos a renderizar el carrito
+    // Volvemos a renderizar el carrito, para mostrar el precio total y todas esas vainas
     const section = document.querySelector('#products')
     showParts(cart, section)
   }

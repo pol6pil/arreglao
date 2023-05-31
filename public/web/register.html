@@ -9,37 +9,45 @@
     <script src="./scripts/generic/userLogger.js"></script>
     <script src="./scripts/header.js" defer></script>
     <script src="./scripts/register.js" defer></script>
+    <script src="./scripts/footer.js" defer></script>
+    <link rel="stylesheet" href="./styles/generic.css">
+    <link rel="stylesheet" href="./styles/register.css">
 </head>
 <body>
-    <form action="#" enctype="application/json" method="post" name="register">
-        <div>
-            <label for="email">Correo electronico:</label>
-            <input required type="email" name="email">
-        </div>
-        <div>
-            <label for="name">Nombre:</label>
-            <input required type="text" name="name">
-        </div>
-        <div>
-            <label for="surname1">Primer apellido:</label>
-            <input required type="text" name="surname1">
-        </div>
-        <div>
-            <label for="surname2">Segundo apellido:</label>
-            <input type="text" name="surname2">
-        </div>
-        <div>
-            <label for="password">Contraseña:</label>
-            <input required type="password" name="password">
-        </div>
-        <div>
-            <label for="password2">Repita la contraseña:</label>
-            <input required type="password" name="password2">
-        </div>
-
-        <input disabled type="submit" name="submit" value="Registrarse">
-        <span class="hidden" id="matchingPasswordsError">Las contraseñas tienen que coincidir</span>
-        <span class="hidden" id="validatingPasswordError">La contraseña tiene que tener 6 caracteres como minimo</span>
-    </form>
+    <main>
+        <section>
+            <h1>Registro de usuario</h1>
+            <form action="#" enctype="application/json" method="post" name="register">
+                <div>
+                    <label for="email">Correo electronico:</label>
+                    <input required type="email" name="email">
+                </div>
+                <div>
+                    <label for="name">Nombre:</label>
+                    <input required type="text" name="name">
+                </div>
+                <div>
+                    <label for="surname1">Primer apellido:</label>
+                    <input required type="text" name="surname1">
+                </div>
+                <div>
+                    <label for="surname2">Segundo apellido:</label>
+                    <input type="text" name="surname2">
+                </div>
+                <div>
+                    <label for="password">Contraseña:</label>
+                    <input required type="password" name="password">
+                </div>
+                <div>
+                    <label for="password2">Repita la contraseña:</label>
+                    <input required type="password" name="password2">
+                </div>
+        
+                <input class="blueButton" disabled type="submit" name="submit" value="Registrarse">
+                <span class="hidden" id="matchingPasswordsError">Las contraseñas tienen que coincidir</span>
+                <span class="hidden" id="validatingPasswordError">La contraseña tiene que tener 6 caracteres como minimo</span>
+            </form>
+        </section>
+    </main>
 </body>
 </html>

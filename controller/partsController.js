@@ -15,7 +15,7 @@ module.exports.getAllParts = async (req, res) => {
     // Almacenamos la consulta en un string para luego modificarlo
     let consult = 'SELECT * FROM piezas'
     const queryColumns = []
-    // Si tiene orden la consulta se lo añadimos al string, order no admite campos preparados
+    // Si tiene orden la consulta se lo añadimos al string, order no admite campos preparados (dios sabra porque porque yo no)
     if (orderBy !== 0) {
       consult += ` ORDER BY ${orderBy}`
       // Cambiamos el tipo de orden segun se haya especificado
@@ -48,7 +48,9 @@ module.exports.getAllParts = async (req, res) => {
 }
 
 module.exports.getAllPartsInAppliance = async (req, res) => {
-  const limit = Number(req.params.limit) || 0
+  const limit = Number(req.query.limit) || 0
+  const orderBy = req.query.orderBy || 0
+  const desc = Number(req.query.desc) || 0
   const appliance = req.params.appliance || 0
 
   if (appliance > 0) {
@@ -57,6 +59,16 @@ module.exports.getAllPartsInAppliance = async (req, res) => {
     let consult = 'SELECT * FROM piezas WHERE id_electrodomestico = ?'
     const queryColumns = []
     queryColumns.push(appliance)
+    // Si tiene orden la consulta se lo añadimos al string, order no admite campos preparados
+    if (orderBy !== 'precio') {
+      if (orderBy !== 0) {
+        consult += ` ORDER BY ${orderBy}`
+        // Cambiamos el tipo de orden segun se haya especificado
+        if (desc === 1) {
+          consult += ' DESC'
+        }
+      }
+    }
     // Si tiene limite la consulta se lo añadimos al string
     if (limit > 0) {
       consult += ' LIMIT ?'
@@ -69,8 +81,9 @@ module.exports.getAllPartsInAppliance = async (req, res) => {
     // Procesamos las filas para poder enviarlas
     const rowsJson = []
     for (const row of rows) {
+      const optionConsult = 'SELECT * FROM opciones_piezas WHERE id_pieza = ?'
       // Consula a la bbdd de las opciones de la pieza
-      const options = await con.query('SELECT * FROM opciones_piezas WHERE id_pieza = ?', [row.id_pieza])
+      const options = await con.query(optionConsult, [row.id_pieza])
       rowsJson.push(part.toJson(row, options[0]))
     }
     res.send(rowsJson)
@@ -82,6 +95,8 @@ module.exports.getAllPartsInAppliance = async (req, res) => {
 
 module.exports.getAllPartsInCategory = async (req, res) => {
   const limit = Number(req.query.limit) || 0
+  const orderBy = req.query.orderBy || 0
+  const desc = Number(req.query.desc) || 0
   const category = req.params.category || 0
 
   if (category > 0) {
@@ -90,6 +105,14 @@ module.exports.getAllPartsInCategory = async (req, res) => {
     let consult = 'SELECT * FROM piezas WHERE id_categoria = ?'
     const queryColumns = []
     queryColumns.push(category)
+    // Si tiene orden la consulta se lo añadimos al string, order no admite campos preparados
+    if (orderBy !== 0) {
+      consult += ` ORDER BY ${orderBy}`
+      // Cambiamos el tipo de orden segun se haya especificado
+      if (desc === 1) {
+        consult += ' DESC'
+      }
+    }
     // Si tiene limite la consulta se lo añadimos al string
     if (limit > 0) {
       consult += ' LIMIT ?'
@@ -305,6 +328,5 @@ async function getOptionImage (id) {
 
 async function deleteOption (id) {
   // Consulta a la bbdd con la opcion
-  const sqlResponse = await con.query('DELETE FROM opciones_piezas WHERE id_opcion = ?', [id])
-  console.log(sqlResponse)
+  await con.query('DELETE FROM opciones_piezas WHERE id_opcion = ?', [id])
 }

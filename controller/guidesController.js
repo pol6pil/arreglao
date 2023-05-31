@@ -19,7 +19,6 @@ module.exports.getAcceptedGuidesByAppliance = async (req, res) => {
       let instrucctions
       const guidesJson = []
       for (const guide of guides) {
-        console.log(guide)
         // Consula a la bbdd de los pasos de la guia
         const stepsSql = await con.query('SELECT * FROM pasos WHERE id_guia = ?', [guide.id_guia])
         steps = stepsSql[0]
@@ -208,7 +207,6 @@ module.exports.getGuideByUser = async (req, res) => {
 }
 
 module.exports.addGuide = async (req, res) => {
-  console.log(req.body)
   if (typeof req.body === 'undefined') {
     res.json({
       status: 'error',
@@ -281,6 +279,7 @@ module.exports.acceptGuide = async (req, res) => {
 }
 
 module.exports.editGuide = async (req, res) => {
+  console.log(req.body)
   const guideId = req.params.id || 0
   if (guideId > 0) {
     if (typeof req.body === 'undefined') {
@@ -324,7 +323,6 @@ module.exports.editGuide = async (req, res) => {
               // Obtenemos la imagen antes de modificar las opciones para luego poder borrar la imagen
               const imgUrl = await getStepImage(step.id)
               // Actualizamos la opcion en la bbdd
-              // NO PERMITE HACER CONSULTA PREPARADA, FIXEO PENDIENTE SI EXISTE
               const query = 'UPDATE pasos SET nombre=?,imagen=?,id_guia=? WHERE id_paso=?'
               await con.query(query, [step.name, req.files[fileIndex].filename, guideId, step.id])
               fileIndex++
@@ -398,7 +396,6 @@ module.exports.deleteGuide = async (req, res) => {
       const steps = sqlResponse[0]
       // Borramos las instrucciones de los pasos
       for (const step of steps) {
-        console.log(step)
         const queryInstruction = 'DELETE FROM instrucciones WHERE id_paso=?'
         await con.query(queryInstruction, [step.id_paso])
         // Borramos las imagenes de los pasos
@@ -463,7 +460,6 @@ async function addInstruction (instruction, stepId) {
 async function getApplianceId (part) {
   // Consulta a la bbdd con la opcion
   const sqlResponse = await con.query('SELECT id_electrodomestico FROM piezas WHERE id_pieza = ?', [part])
-  console.log(sqlResponse[0][0], sqlResponse[0][0].id_electrodomestico, part)
   return sqlResponse[0][0].id_electrodomestico
 }
 

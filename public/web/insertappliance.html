@@ -9,22 +9,27 @@
     <script src="./scripts/generic/userChecker.js"></script>
     <script src="./scripts/header.js" defer></script>
     <script src="scripts/insertAppliance.js" defer></script>
-    <link rel="stylesheet" href="./styles/insertappliance.css">
+    <script src="./scripts/footer.js" defer></script>
+    <link rel="stylesheet" href="./styles/generic.css">
+    <link rel="stylesheet" href="./styles/insertPart.css">
 </head>
 
 <body>
     <main>
-        <form name="appliance" enctype="multipart/form-data" method="post" onsubmit="return false">
-            <div>
-                <label for="nombre">Nombre:</label>
-                <input type="text" name="nombre">
-            </div>
-            <div>
-                <label for="files">Imagen:</label>
-                <input type="file" name="imagen" accept="image/*">
-            </div>
-            <input type="submit" value="Enviar">
-        </form>
+        <section>
+            <form name="appliance" enctype="multipart/form-data" method="post" onsubmit="return false">
+                <div>
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" name="nombre">
+                </div>
+                <div>
+                    <label for="files">Imagen:</label>
+                    <input type="file" name="imagen" accept="image/*">
+                </div>
+                <input class="blueButton" type="submit" value="Enviar">
+            </form>
+        </section>
+        
     </main>
 
 </body>

@@ -10,26 +10,32 @@
     <script src="scripts/generic/showPart.js" defer></script>
     <script src="scripts/header.js" defer></script>
     <script src="scripts/parts.js" defer></script>
+    <script src="./scripts/footer.js" defer></script>
+    <link rel="stylesheet" href="./styles/generic.css">
+    <link rel="stylesheet" href="./styles/parts.css">
 </head>
 
 <body>
-    <aside>
-        <span>Filtrar por categorias</span>
-        <div id="categoriasFiltrar">
-
-        </div>
-    </aside>
     <main>
-        <section id="ordenarPor">
-            <button id="ordenarPorButton">Ordenar por:</button>
-            <div style="display:none" id="ordenarPorDropdown">
-                <p id="sort1">Alfabeticamente ascendente</p>
-                <p id="sort2">Alfabeticamente descendente</p>
-                <p id="sort3">Precio ascendente</p>
-                <p id="sort4">Precio descendente</p>
+        <section>
+            <aside>
+                <span>Filtrar por categorias</span>
+                <div id="categoriasFiltrar">
+
+                </div>
+            </aside>
+            <div id="ordenarPor">
+                <button class="blueButton" id="ordenarPorButton">Ordenar por:</button>
+                <div style="display:none" id="ordenarPorDropdown">
+                    <p id="sort1">Alfabeticamente ascendente</p>
+                    <p id="sort2">Alfabeticamente descendente</p>
+                    <p id="sort3">Precio ascendente</p>
+                    <p id="sort4">Precio descendente</p>
+                </div>
             </div>
-        </section>
-        <section id="partes">
+            <div id="partes">
+
+            </div>
         </section>
     </main>
 

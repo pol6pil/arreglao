@@ -9,18 +9,26 @@
     <script src="./scripts/header.js" defer></script>
     <script src="./scripts/generic/userLogger.js"></script>
     <script src="./scripts/login.js" defer></script>
+    <script src="./scripts/footer.js" defer></script>
+    <link rel="stylesheet" href="./styles/generic.css">
+    <link rel="stylesheet" href="./styles/login.css">
 </head>
 <body>
-    <form action="#" enctype="application/json" method="post" name="login">
-        <div>
-            <label for="email">Correo electronico:</label>
-            <input required type="email" name="email">
-        </div>
-        <div>
-            <label for="password">Contraseña:</label>
-            <input required type="password" name="password">
-        </div>
-        <input type="submit" name="submit" value="Iniciar sesion">
-    </form>
+    <main>
+        <section>
+            <h1>Iniciar Sesion</h1>
+            <form action="#" enctype="application/json" method="post" name="login">
+                <div>
+                    <label for="email">Correo electronico:</label>
+                    <input required type="email" name="email">
+                </div>
+                <div>
+                    <label for="password">Contraseña:</label>
+                    <input required type="password" name="password">
+                </div>
+                <input class="blueButton" type="submit" name="submit" value="Iniciar sesion">
+            </form>
+        </section>
+    </main>
 </body>
 </html>

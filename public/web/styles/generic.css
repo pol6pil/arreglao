@@ -8,8 +8,15 @@
     --grisClaro: #EEEEEE;
     --azul: #0071CE;
     --azulHover: #0b66b1;
+    --azulNoteBg: #edf6ff;
     --negroAzulado: #222831;
+    --rojoWarning: #d93531;
+    --rojoWarningHover: #bb3330;
+    --rojoWarningBg: #ffeded;
 
+}
+html{
+    scroll-behavior: smooth;
 }
 body {
     font-family: Open-Sans, Arial, Helvetica, sans-serif;
@@ -104,6 +111,7 @@ footer {
     padding: 20px;
 }
 .blueButton{
+    cursor: pointer;
     background-color: var(--azul);
     text-decoration: none;
     color: #FFF;
@@ -239,3 +247,101 @@ footer>div {
     color: var(--azul);
     transition: all 0.3s;
 }
+
+.appliance a, .guide a{
+    text-decoration: none;
+    height: 150px;
+    padding: 10px;
+    background-color: var(--grisOscuro);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.appliance a:hover, .guide a:hover{
+    transform: translateY(-10px);
+    box-shadow: 2px 2px 5px 1px black;
+    transition: all 0.2s;
+}
+
+.appliance a span, .guide a span{
+    color: #FFF;
+    font-weight: bold;
+    font-size: 30px;
+}
+
+.appliance img, .guide img{
+    max-height: 150px;
+    width: 25%;
+}
+
+main{
+    min-height: 675px;
+}
+select, main input:not(input[type="file"]), textarea{
+    padding: 5px;
+    border-radius: 5px;
+    border: var(--azul) solid 3px;
+}
+textarea{
+    resize: none;
+}
+
+main input[type="number"]{
+    width: 75px;
+}
+form img{
+    max-width: 400px;
+    width: 100%;
+}
+.note{
+    background-color: var(--azulNoteBg);
+    padding: 25px;
+    border: var(--azul) solid 2px;
+    border-radius: 10px;
+}
+
+.note span{
+    color: var(--azul);
+}
+
+.warning{
+    background-color: var(--rojoWarningBg);
+    padding: 25px;
+    border: var(--rojoWarning) solid 2px;
+    border-radius: 10px;
+}
+
+.warning span{
+    color: var(--rojoWarning);
+}
+
+.eraseButton{
+    background-color: var(--rojoWarning);
+    color: white;
+    font-weight: bold;
+    border: 0px;
+    font-size: larger;
+    padding: 7px;
+    border-radius: 100px;
+    cursor:pointer;
+    transition: all 0.3s;
+}
+.eraseButton:hover{
+    background-color: var(--rojoWarningHover);
+    transition: all 0.3s;
+}
+.blueButton:disabled{
+    background-color: var(--rojoWarningHover);
+}
+.hidden{
+    display: none;
+}
+
+.title {
+    font-weight: bold;
+    font-size: 20px;
+}   
