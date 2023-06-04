@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports.toJson = (row, rawOptions) => {
+module.exports.toJson = (rawPart, rawOptions) => {
   // Procesamos las imagenes para que contengan peticiones a la api
   const options = []
   if (rawOptions !== undefined) {
@@ -17,14 +17,14 @@ module.exports.toJson = (row, rawOptions) => {
     }
   }
   return {
-    id: row.id_pieza,
-    name: row.nombre,
-    description: row.descripcion,
-    warranty: row.garantia,
+    id: rawPart.id_pieza,
+    name: rawPart.nombre,
+    description: rawPart.descripcion,
+    warranty: rawPart.garantia,
     options,
-    warning: row.advertencia,
-    note: row.nota,
-    category: row.id_categoria,
-    appliance: row.id_electrodomestico
+    warning: rawPart.advertencia,
+    note: rawPart.nota,
+    category: rawPart.id_categoria,
+    appliance: rawPart.id_electrodomestico
   }
 }

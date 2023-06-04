@@ -2,6 +2,8 @@
 
 const order = require('../model/order')
 const con = require('../middleware/sqlconnection')
+const nodemailer = require('nodemailer')
+
 // Funcionalidades de la api respecto a piezas
 module.exports.getUserOrders = async (req, res) => {
   const email = req.params.email || 0
@@ -55,6 +57,9 @@ module.exports.addOrder = async (req, res) => {
       }
       res.send({ message: 'order placed' })
       await connection.commit()
+      // Si todo esta correcto enviamos un correo con la factura
+      sendMailOrder(req.body.parts, req.body.email)
+
       // Si da error la insercion, borramos la imagen y hacemos un rollback a la transaccion
     } catch (error) {
       await connection.rollback()
@@ -62,4 +67,54 @@ module.exports.addOrder = async (req, res) => {
       res.status(400).send({ error: 'insert failed' })
     }
   }
+}
+
+async function getPartOption (id) {
+  // Consula a la bbdd de las opciones de la pieza
+  const option = await con.query('SELECT nombre FROM opciones_piezas WHERE id_opcion = ?', [id])
+  return option[0][0].nombre
+}
+
+async function getPart (id) {
+  // Consula a la bbdd de las opciones de la pieza
+  const part = await con.query('SELECT nombre FROM piezas WHERE id_pieza = ?', [id])
+  return part[0][0].nombre
+}
+
+async function sendMailOrder (parts, email) {
+  // Creamos un array de las opciones y piezas realizadas por el usuario
+  const nameOptions = []
+  const nameParts = []
+
+  const partsJson = JSON.parse(parts)
+
+  for (const part of partsJson) {
+    nameOptions.push(await getPartOption(part.optionId))
+    nameParts.push(await getPart(part.id))
+  }
+
+  // Creamos el texto del array
+  let textemail = 'Ha realizado un pedido con los siguientes productos:'
+  let i = 0
+  for (const part of partsJson) {
+    textemail += `\n Pieza: ${nameParts[i]}   Opcion: ${nameOptions[i]}  Precio: ${part.price}    Cantidad: ${part.quantity}`
+    i++
+  }
+
+  // create reusable transporter object using the default SMTP transport
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'arreglaoticket@gmail.com', // usuario
+      pass: 'vsanzgicetciqylo' // contraseña
+    }
+  })
+
+  // send mail with defined transport object
+  await transporter.sendMail({
+    from: 'arreglaoticket@gmail.com', // direccion del emisor
+    to: email, // lista de direcciones de los receptores
+    subject: 'Pedido confirmado', // Subject line
+    text: textemail // plain text body
+  })
 }

@@ -279,7 +279,6 @@ module.exports.acceptGuide = async (req, res) => {
 }
 
 module.exports.editGuide = async (req, res) => {
-  console.log(req.body)
   const guideId = req.params.id || 0
   if (guideId > 0) {
     if (typeof req.body === 'undefined') {

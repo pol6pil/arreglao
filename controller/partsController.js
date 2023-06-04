@@ -15,9 +15,10 @@ module.exports.getAllParts = async (req, res) => {
     // Almacenamos la consulta en un string para luego modificarlo
     let consult = 'SELECT * FROM piezas'
     const queryColumns = []
-    // Si tiene orden la consulta se lo añadimos al string, order no admite campos preparados (dios sabra porque porque yo no)
+    // Si tiene orden la consulta se lo añadimos al string
     if (orderBy !== 0) {
-      consult += ` ORDER BY ${orderBy}`
+      consult += ' ORDER BY ?'
+      queryColumns.push(orderBy)
       // Cambiamos el tipo de orden segun se haya especificado
       if (desc === 1) {
         consult += ' DESC'
@@ -30,13 +31,9 @@ module.exports.getAllParts = async (req, res) => {
     }
     // Consulta a la bbdd con la consulta almacenada
     const sqlResponse = await con.query(consult, queryColumns)
-
-    // Obtencion de las filas devueltas
-    const rows = sqlResponse[0]
-
     // Procesamos las filas para poder enviarlas
     const rowsJson = []
-    for (const row of rows) {
+    for (const row of sqlResponse[0]) {
     // Consula a la bbdd de las opciones de la pieza
       const options = await con.query('SELECT * FROM opciones_piezas WHERE id_pieza = ?', [row.id_pieza])
       rowsJson.push(part.toJson(row, options[0]))
@@ -62,7 +59,8 @@ module.exports.getAllPartsInAppliance = async (req, res) => {
     // Si tiene orden la consulta se lo añadimos al string, order no admite campos preparados
     if (orderBy !== 'precio') {
       if (orderBy !== 0) {
-        consult += ` ORDER BY ${orderBy}`
+        consult += ' ORDER BY ?'
+        queryColumns.push(orderBy)
         // Cambiamos el tipo de orden segun se haya especificado
         if (desc === 1) {
           consult += ' DESC'

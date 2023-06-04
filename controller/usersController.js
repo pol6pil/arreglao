@@ -113,15 +113,18 @@ module.exports.changePfp = async (req, res) => {
     res.status(400).send({ error: 'user not found' })
   } else {
     try {
-    // Almacenamos la consulta en un string
+      // Obtenemos la imagen anterior
+      const consultSelect = 'SELECT foto FROM usuarios WHERE email = ?'
+      // Consulta a la bbdd con la consulta almacenada
+      let sqlResponse = await con.query(consultSelect, email)
+      // Borramos la imagen anterior
+      deleteFile(path.join(process.cwd(), '/public/images/users/', sqlResponse[0][0].foto))
+      // Almacenamos la consulta en un string
       const consult = 'UPDATE usuarios SET foto=? WHERE email = ?'
       // Consulta a la bbdd con la consulta almacenada
       await con.query(consult, [req.files[0].filename, email])
-
-      const consultSelect = 'SELECT foto FROM usuarios WHERE email = ?'
       // Consulta a la bbdd con la consulta almacenada
-      const sqlResponse = await con.query(consultSelect, email)
-      console.log(sqlResponse[0][0])
+      sqlResponse = await con.query(consultSelect, email)
 
       // Obtencion de la nueva foto de perfil
       const imgUrl = user.getImage(sqlResponse[0][0])
