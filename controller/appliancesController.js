@@ -144,7 +144,7 @@ module.exports.editAppliance = async (req, res) => {
   }
 }
 
-async function getApplianceSql(id) {
+async function getApplianceSql (id) {
   // Consulta a la bbdd con el id
   const sqlResponse = await con.query('SELECT * FROM electrodomestico WHERE id_electrodomestico = ?', [id])
   // Procesamos la respuesta para poder enviarlas
@@ -152,7 +152,7 @@ async function getApplianceSql(id) {
   return appliance.toJson(row[0])
 }
 
-async function getApplianceImageSql(id) {
+async function getApplianceImageSql (id) {
   // Consulta a la bbdd a la pieza con el id
   const sqlResponse = await con.query('SELECT imagen FROM electrodomestico WHERE id_electrodomestico = ?', [id])
   // Procesamos la respuesta para poder enviarlas

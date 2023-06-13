@@ -303,7 +303,7 @@ module.exports.deletePart = async (req, res) => {
   }
 }
 
-async function getPartSql(id) {
+async function getPartSql (id) {
   // Consulta a la bbdd a la pieza con el id
   const sqlResponse = await con.query('SELECT * FROM piezas WHERE id_pieza = ?', [id])
   // Procesamos la respuesta para poder enviarlas
@@ -314,13 +314,13 @@ async function getPartSql(id) {
   return part.toJson(row[0], options[0])
 }
 
-async function getOptionImage(id) {
+async function getOptionImage (id) {
   // Consulta a la bbdd con la opcion
   const sqlResponse = await con.query('SELECT imagen FROM opciones_piezas WHERE id_opcion = ?', [id])
   return sqlResponse[0][0].imagen
 }
 
-async function deleteOption(id) {
+async function deleteOption (id) {
   // Consulta a la bbdd con la opcion
   await con.query('DELETE FROM opciones_piezas WHERE id_opcion = ?', [id])
 }
