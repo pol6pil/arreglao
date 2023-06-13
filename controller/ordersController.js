@@ -58,7 +58,7 @@ module.exports.addOrder = async (req, res) => {
       res.send({ message: 'order placed' })
       await connection.commit()
       // Si todo esta correcto enviamos un correo con la factura
-      sendMailOrder(req.body.parts, req.body.email)
+      sendMailOrder(parts, req.body.email)
 
       // Si da error la insercion, borramos la imagen y hacemos un rollback a la transaccion
     } catch (error) {
@@ -86,22 +86,20 @@ async function sendMailOrder (parts, email) {
   const nameOptions = []
   const nameParts = []
 
-  const partsJson = JSON.parse(parts)
-
-  for (const part of partsJson) {
+  for (const part of parts) {
     nameOptions.push(await getPartOption(part.optionId))
     nameParts.push(await getPart(part.id))
   }
 
-  // Creamos el texto del array
+  // Creamos el texto del correo
   let textemail = 'Ha realizado un pedido con los siguientes productos:'
   let i = 0
-  for (const part of partsJson) {
+  for (const part of parts) {
     textemail += `\n Pieza: ${nameParts[i]}   Opcion: ${nameOptions[i]}  Precio: ${part.price}    Cantidad: ${part.quantity}`
     i++
   }
 
-  // create reusable transporter object using the default SMTP transport
+  // Crear objeto reusable que enviara los correos de las facturas
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -110,11 +108,11 @@ async function sendMailOrder (parts, email) {
     }
   })
 
-  // send mail with defined transport object
+  // Enviar el correo
   await transporter.sendMail({
     from: 'arreglaoticket@gmail.com', // direccion del emisor
     to: email, // lista de direcciones de los receptores
-    subject: 'Pedido confirmado', // Subject line
-    text: textemail // plain text body
+    subject: 'Pedido confirmado', // asunto del correo
+    text: textemail // cuerpo del mensaje
   })
 }
