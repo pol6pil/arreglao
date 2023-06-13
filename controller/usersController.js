@@ -128,7 +128,6 @@ module.exports.changePfp = async (req, res) => {
 
       // Obtencion de la nueva foto de perfil
       const imgUrl = user.getImage(sqlResponse[0][0])
-      console.log(imgUrl)
       res.send(imgUrl)
     } catch (error) {
       console.log(error)

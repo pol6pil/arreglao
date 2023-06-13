@@ -48,3 +48,21 @@ module.exports.addReview = async (req, res) => {
     }
   }
 }
+
+module.exports.deleteReview = async (req, res) => {
+  const id = Number(req.params.id) || 0
+
+  // Si el id se ha marcado hacemos la consulta
+  if (id > 0) {
+    try {
+      // Consulta a la bbdd con el id
+      await con.query('DELETE FROM reviews WHERE id_review = ?', [id])
+      res.send({ status: 'ok' })
+    } catch (error) {
+      console.log(error)
+      res.status(400).send({ error })
+    }
+  } else {
+    res.status(400).send({ error: 'invalid id' })
+  }
+}

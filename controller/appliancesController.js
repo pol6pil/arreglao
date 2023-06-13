@@ -49,6 +49,30 @@ module.exports.getAppliance = async (req, res) => {
     res.status(400).send({ error: 'invalid id' })
   }
 }
+
+module.exports.deleteAppliance = async (req, res) => {
+  const id = Number(req.params.id) || 0
+
+  // Si el id se ha marcado hacemos la consulta
+  if (id > 0) {
+    try {
+      // Consulta a la bbdd con el id
+      const sqlResponse = await con.query('SELECT * FROM electrodomestico WHERE id_electrodomestico = ?', [id])
+      // Procesamos la respuesta para poder enviarlas
+      const row = sqlResponse[0][0]
+      // Consulta a la bbdd con el id
+      await con.query('DELETE FROM electrodomestico WHERE id_electrodomestico = ?', [id])
+      res.send({ status: 'ok' })
+      // Borramos la imagen
+      deleteFile(path.join(process.cwd(), '/public/images/appliances/', row.imagen))
+    } catch (error) {
+      console.log(error)
+      res.status(400).send({ error })
+    }
+  } else {
+    res.status(400).send({ error: 'invalid id' })
+  }
+}
 module.exports.addAppliance = async (req, res) => {
   if (typeof req.body === 'undefined') {
     res.json({
@@ -120,15 +144,15 @@ module.exports.editAppliance = async (req, res) => {
   }
 }
 
-async function getApplianceSql (id) {
-  // Consulta a la bbdd a la pieza con el id
+async function getApplianceSql(id) {
+  // Consulta a la bbdd con el id
   const sqlResponse = await con.query('SELECT * FROM electrodomestico WHERE id_electrodomestico = ?', [id])
   // Procesamos la respuesta para poder enviarlas
   const row = sqlResponse[0]
   return appliance.toJson(row[0])
 }
 
-async function getApplianceImageSql (id) {
+async function getApplianceImageSql(id) {
   // Consulta a la bbdd a la pieza con el id
   const sqlResponse = await con.query('SELECT imagen FROM electrodomestico WHERE id_electrodomestico = ?', [id])
   // Procesamos la respuesta para poder enviarlas

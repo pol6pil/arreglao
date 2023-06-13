@@ -43,6 +43,6 @@ router.get('/', appliance.getAllAppliances)
 router.get('/:id', appliance.getAppliance)
 router.post('/', upload.array('files'), appliance.addAppliance)
 router.put('/:id', upload.array('files'), appliance.editAppliance)
-// router.delete('/:id', part.deletePart)
+router.delete('/:id', appliance.deleteAppliance)
 
 module.exports = router

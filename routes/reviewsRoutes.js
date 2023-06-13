@@ -10,5 +10,6 @@ const review = require('../controller/reviewsController')
 // Rutas de pedidos
 router.get('/:partId', review.getPartReviews)
 router.post('/', upload.none(), review.addReview)
+router.delete('/:id', upload.none(), review.deleteReview)
 
 module.exports = router

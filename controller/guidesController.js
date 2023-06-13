@@ -228,7 +228,6 @@ module.exports.addGuide = async (req, res) => {
       // Creamos un indice para recorrer los archivos de las opciones
       let fileIndex = 1
       for (const step of steps) {
-        console.log(step)
         // Si se ha insertado una imagen la subimos a la bbdd
         if (step.imageUpload) {
           const queryStep = 'INSERT INTO `pasos`(`nombre`, `imagen`, `id_guia`) VALUES (?,?,?)'

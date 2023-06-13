@@ -15,10 +15,9 @@ module.exports.getAllParts = async (req, res) => {
     // Almacenamos la consulta en un string para luego modificarlo
     let consult = 'SELECT * FROM piezas'
     const queryColumns = []
-    // Si tiene orden la consulta se lo añadimos al string
+    // Si tiene orden la consulta se lo añadimos al string, order no admite campos preparados (no funciona DESC)
     if (orderBy !== 0) {
-      consult += ' ORDER BY ?'
-      queryColumns.push(orderBy)
+      consult += ` ORDER BY ${orderBy}`
       // Cambiamos el tipo de orden segun se haya especificado
       if (desc === 1) {
         consult += ' DESC'
@@ -34,7 +33,7 @@ module.exports.getAllParts = async (req, res) => {
     // Procesamos las filas para poder enviarlas
     const rowsJson = []
     for (const row of sqlResponse[0]) {
-    // Consula a la bbdd de las opciones de la pieza
+      // Consula a la bbdd de las opciones de la pieza
       const options = await con.query('SELECT * FROM opciones_piezas WHERE id_pieza = ?', [row.id_pieza])
       rowsJson.push(part.toJson(row, options[0]))
     }
@@ -56,15 +55,12 @@ module.exports.getAllPartsInAppliance = async (req, res) => {
     let consult = 'SELECT * FROM piezas WHERE id_electrodomestico = ?'
     const queryColumns = []
     queryColumns.push(appliance)
-    // Si tiene orden la consulta se lo añadimos al string, order no admite campos preparados
-    if (orderBy !== 'precio') {
-      if (orderBy !== 0) {
-        consult += ' ORDER BY ?'
-        queryColumns.push(orderBy)
-        // Cambiamos el tipo de orden segun se haya especificado
-        if (desc === 1) {
-          consult += ' DESC'
-        }
+    // Si tiene orden la consulta se lo añadimos al string, order no admite campos preparados (no funciona DESC)
+    if (orderBy !== 0) {
+      consult += ` ORDER BY ${orderBy}`
+      // Cambiamos el tipo de orden segun se haya especificado
+      if (desc === 1) {
+        consult += ' DESC'
       }
     }
     // Si tiene limite la consulta se lo añadimos al string
@@ -307,7 +303,7 @@ module.exports.deletePart = async (req, res) => {
   }
 }
 
-async function getPartSql (id) {
+async function getPartSql(id) {
   // Consulta a la bbdd a la pieza con el id
   const sqlResponse = await con.query('SELECT * FROM piezas WHERE id_pieza = ?', [id])
   // Procesamos la respuesta para poder enviarlas
@@ -318,13 +314,13 @@ async function getPartSql (id) {
   return part.toJson(row[0], options[0])
 }
 
-async function getOptionImage (id) {
+async function getOptionImage(id) {
   // Consulta a la bbdd con la opcion
   const sqlResponse = await con.query('SELECT imagen FROM opciones_piezas WHERE id_opcion = ?', [id])
   return sqlResponse[0][0].imagen
 }
 
-async function deleteOption (id) {
+async function deleteOption(id) {
   // Consulta a la bbdd con la opcion
   await con.query('DELETE FROM opciones_piezas WHERE id_opcion = ?', [id])
 }
